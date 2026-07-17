@@ -1,0 +1,20 @@
+# macOS / editor noise
+.DS_Store
+._*
+*.swp
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Script outputs (regenerable; keep the repo = inputs + code)
+julia/*_output.csv
+python/*_output.csv
+julia/*_reconstructed.csv
+python/*_reconstructed.csv
+julia/*.pdf
+julia/*.png
+python/*.pdf
+python/*.png
+factor_posterior_bands.*
+posterior_bands_output.*
