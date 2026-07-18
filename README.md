@@ -44,7 +44,7 @@ factors  →  coefficients  →  moments / micro data
 | Script | In → Out |
 |---|---|
 | `factors_to_coefficients` | factors → coefficient rows (`FactorMap`; perturb a factor for counterfactuals). **`_average` trend convention only** — the map is re-estimated from the published files (exact, R² = 1.0) since the model's own loadings/means/trend are not shipped; the `_normal` HP trend is not a function of the factors. |
-| `coefficients_to_moments` | coefficients → decile cut points + copula density |
+| `coefficients_to_moments` | coefficients → decile cuts & averages, levels, shares, robust Ginis, copula density (`DATE=all` for full time series) |
 | `coefficients_to_micro_data` | coefficients → weighted synthetic cross-sections |
 | `posterior_bands` | factor draws → credible band on any moment |
 | `plot_factor_bands` | factor draws → factor paths with bands |
