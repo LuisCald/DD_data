@@ -2,7 +2,14 @@
 """
 factors_to_coefficients.py — reconstruct coefficient rows from the smoothed
 factors (the FactorMap bridge). Python twin of factors_to_coefficients.jl;
-see that file's header. Middle stage of the pipeline
+see that file's header for WHY this works without the model's Gj/stds/means/
+trend exports (FactorMap re-estimates the composite affine map from the
+published files; exact on the `_average` trend convention, median R^2 = 1.000)
+and its one hard limitation (do NOT fit on `_normal` files — the date-anchored
+HP trend is not a function of the factors, R^2 drops to ~0.4).
+
+Only the first 8 state columns (x1..x8) are the distributional factors;
+x9..x32 are their lags, x33..x43 the aggregate block. Middle stage of
 
     factors  ->  coefficients  ->  moments / micro data
 

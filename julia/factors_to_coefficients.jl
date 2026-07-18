@@ -2,14 +2,30 @@
 # factors_to_coefficients.jl — reconstruct coefficient rows from the
 # smoothed factors (the FactorMap bridge).
 #
-# Fits the linear map factors → coefficients from the published point-estimate
-# files (`FactorMap` in julia/reconstruct.jl; on the `_average` trend
-# files the fit is exact, median R² = 1.0), then writes the reconstructed
-# coefficient row for every date. This is the middle stage of the pipeline
+# WHY THIS WORKS (and its one hard limitation)
+# The estimation model's own factors → coefficients chain is
+#     coef = Gⱼ · x_smoothed, rescaled by per-block stds, plus means and trend
+# (Reconstruction.jl in the DD_replication repo). Gⱼ, stds, means, and the
+# HP trend are model exports that are NOT shipped here — so the model-based
+# reconstruction is not reproducible from this repo. `FactorMap` sidesteps
+# that: it RE-ESTIMATES the composite affine map by OLS from the two published
+# files themselves (coef_t = α + Λ̂·F_4q). Under the `_average` trend
+# convention the trend is a constant per coefficient, so the whole chain is
+# one affine map and OLS recovers it exactly — median R² = 1.000 across all
+# 1730 coefficients.
+#
+# LIMITATION: this only holds for the `_average` files. The `_normal` files
+# carry the date-anchored HP trend, which is not a function of the factors —
+# fitting on them fails (R² ≈ 0.4). Do not use this bridge for `_normal`.
+#
+# This is the middle stage of the pipeline
 #
 #     factors  →  coefficients  →  moments / micro data
 #
-# and the hook for counterfactuals: perturb a factor before predicting, e.g.
+# and the hook for counterfactuals: perturb a factor before predicting.
+# Only the FIRST 8 state columns (x1..x8) are the distributional factors —
+# x9..x32 are their lags (used via the 4-quarter average), x33..x43 the
+# aggregate block. Example:
 #
 #     include("factors_to_coefficients.jl")          # in a session
 #     F = factors_at(fm, "2008-Q3"); F[1] += 1.0     # shock factor 1

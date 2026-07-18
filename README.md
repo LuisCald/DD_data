@@ -20,8 +20,8 @@ Methodology, estimation code, and the full replication package live in
 
 | File | What it is |
 |---|---|
-| `smoothed_factors.csv` | **Latent factors** $\hat F_t$ (43 factors × 248 quarters) — the most compact summary of the joint dynamics (point estimate / posterior mode). |
-| `smoothed_factor_draws.csv` | **400 posterior draws** of the factors (parameter + state uncertainty). The basis for credible bands on any moment. |
+| `smoothed_factors.csv` | **Latent states** $\hat F_t$ (43 columns × 248 quarters, point estimate / posterior mode). **The first 8 columns (`x1`–`x8`) are the distributional factors — the main objects.** `x9`–`x32` are their lags (the model conditions annual surveys on 4-quarter averages), `x33`–`x43` the aggregate block. |
+| `smoothed_factor_draws.csv` | **400 posterior draws** of the states (parameter + state uncertainty), same column layout — again, `x1`–`x8` are the factors that matter. The basis for credible bands on any moment. |
 | `smoothed_factors_bands.csv` | Ready-made per-quarter 5/50/95 percentiles of each factor. |
 | `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | **Model-implied Legendre coefficients** of the joint distribution, dense across all quarters. `_normal` = HP trend re-added (use in-sample); `_average` = time-averaged trend (use for extrapolation). |
 | `{PSID,SCF}_functional_data{,_detrended}.csv` | The raw survey-based coefficient estimates that *enter* the model (NaN where no survey). |
@@ -43,7 +43,7 @@ factors  →  coefficients  →  moments / micro data
 
 | Script | In → Out |
 |---|---|
-| `factors_to_coefficients` | factors → coefficient rows (`FactorMap`; perturb a factor for counterfactuals) |
+| `factors_to_coefficients` | factors → coefficient rows (`FactorMap`; perturb a factor for counterfactuals). **`_average` trend convention only** — the map is re-estimated from the published files (exact, R² = 1.0) since the model's own loadings/means/trend are not shipped; the `_normal` HP trend is not a function of the factors. |
 | `coefficients_to_moments` | coefficients → decile cut points + copula density |
 | `coefficients_to_micro_data` | coefficients → weighted synthetic cross-sections |
 | `posterior_bands` | factor draws → credible band on any moment |
