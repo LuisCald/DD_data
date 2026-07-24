@@ -79,3 +79,8 @@ micro.to_stata("data/dd_master.dta", write_index=False, version=118,
                variable_labels={k: v[:80] for k, v in mlab.items() if k in micro.columns},
                data_label="Distributional Dynamics: synthetic microdata"[:80])
 print("written:", "dd_series.dta", series.shape, "| dd_master.dta", micro.shape)
+
+# ── CSV twins (same harmonized names; URL-readable from Julia/Python/R) ──────
+series.to_csv("data/dd_series.csv", index=False)
+micro.to_csv("data/dd_master.csv", index=False)
+print("csv twins written")
