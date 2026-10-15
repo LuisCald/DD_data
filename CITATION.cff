@@ -1,6 +1,9 @@
 cff-version: 1.2.0
-message: "If you use this software or replication package, please cite the paper."
-title: "Distributional Dynamics — Replication Package"
+message: "If you use these data, please cite the paper (preferred citation below)."
+title: "Distributional Dynamics — Data"
+type: dataset
+version: "2026-10"
+date-released: "2026-10-15"
 authors:
   - family-names: "Bayer"
     given-names: "Christian"
@@ -13,9 +16,10 @@ authors:
     given-names: "Moritz"
     affiliation: "University of Mannheim, CEPR, IZA, CESifo"
 license: MIT
-repository-code: "https://github.com/LuisCald/DD_code"
+repository-code: "https://github.com/LuisCald/DD_data"
+url: "https://www.distributionaldynamics.com"
 preferred-citation:
-  type: article
+  type: report
   title: "Distributional Dynamics"
   authors:
     - family-names: "Bayer"
@@ -24,6 +28,9 @@ preferred-citation:
       given-names: "Luis"
     - family-names: "Kuhn"
       given-names: "Moritz"
+  institution:
+    name: "Centre for Economic Policy Research"
+  collection-title: "CEPR Discussion Paper"
+  number: "19829"
   year: 2026
   month: 3
-  notes: "CEPR Discussion Paper 19829"

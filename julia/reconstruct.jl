@@ -398,8 +398,8 @@ Use:
 
 ```julia
 fm = FactorMap(
-    "data/synthetic/PSID_coefficients_average.csv",
-    "data/synthetic/smoothed_factors.csv";
+    "data/PSID_coefficients_average.csv",
+    "data/smoothed_factors.csv";
     n_factors = 8,
 )
 F = factors_at(fm, "2008-Q3")          # 4q-averaged factor at that date

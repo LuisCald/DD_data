@@ -9,10 +9,16 @@ Short version: one weighted synthetic cross-section per quarter — one row per
 cell of the 10x10x10 decile copula grid. `cop_share` is the cell's household
 weight share; consum/income/wealth are decile AVERAGES relative to the
 per-household mean. Scale to dollar levels with
-data/synthetic/aggregate_anchors.csv (level = value * <measure>_per_hh).
+data/aggregate_anchors.csv (level = value * <measure>_per_hh).
+(The published data/PSID_synthetic_microdata.csv and dd_master are already
+scaled this way, i.e. in 2019 USD per household.)
 
     python coefficients_to_micro_data.py                        # PSID, all quarters
     python coefficients_to_micro_data.py --dataset PSID --date 2008-Q3
+    python coefficients_to_micro_data.py --out my_micro.csv     # write elsewhere
+
+Default output: python/coefficients_to_micro_data_output.csv (git-ignored;
+never overwrites the published data/ files).
 
 Dependencies: numpy, pandas.
 """
@@ -65,6 +71,8 @@ def main() -> None:
     ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
     ap.add_argument("--trend", default="normal", choices=["normal", "average"])
     ap.add_argument("--date", default=None, help="one quarter, e.g. 2008-Q3; omit for all")
+    ap.add_argument("--out", default=os.path.join(HERE, "coefficients_to_micro_data_output.csv"),
+                    help="output CSV path (default: python/coefficients_to_micro_data_output.csv)")
     args = ap.parse_args()
 
     csv = os.path.join(REPO, "data",
@@ -76,8 +84,7 @@ def main() -> None:
     dates = [args.date] if args.date else r.available_dates()
     out = pd.concat([micro_rows(r, d) for d in dates], ignore_index=True)
 
-    dest = os.path.join(REPO, "data",
-                        f"{args.dataset}_synthetic_microdata.csv")
+    dest = args.out
     out.to_csv(dest, index=False)
     print(f"Wrote {len(out)} rows ({len(dates)} quarters x {GRID**3} cells) -> {dest}")
 

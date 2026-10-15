@@ -18,13 +18,20 @@ def add_tq(df):
     df.insert(0, "year", yq[0].astype(int))
     return df
 
-def grid_label(sfx):
-    return "top (99.9999th pct)" if abs(sfx - 0.999999) < 1e-9 else f"{int(round(sfx*100))}th pct"
-
 def grid_name(sfx):
     return "top" if abs(sfx - 0.999999) < 1e-9 else f"p{int(round(sfx*100))}"
 
-STAT_LABEL = {"quantiles": "quantile", "levels": "decile-group mean level", "shares": "cumulative share"}
+def series_label(meas, stat, sfx, vlab):
+    """Variable label. All three stats are DECILE-GROUP values (2019 USD):
+    `quantiles` = mean per household of the group, `levels` = group total,
+    `shares` = group share of the total (the ten shares sum to 1).
+    p10 = group 0-10th pct, ..., p90 = 80-90th pct, top = top 10%."""
+    name = {"consum": "Consumption", "income": "Income", "wealth": "Wealth"}[meas]
+    grp = ("top 10%" if abs(sfx - 0.999999) < 1e-9
+           else f"decile group ending at {int(round(sfx*100))}th pct")
+    what = {"quantiles": "mean/HH", "levels": "total", "shares": "share"}[stat]
+    return f"{name} {what} of {grp} ({vlab})"
+
 
 # ── dd_series ────────────────────────────────────────────────────────────────
 frames = []
@@ -44,14 +51,17 @@ for view, vtag, vlab in [("PSID_functional_data", "psid", "PSID view"),
         stat, meas, sfx = m.group(1), m.group(2), float(m.group(3))
         new = f"{meas}_{stat[:-1] if stat != 'levels' else 'level'}_{grid_name(sfx)}_{vtag}"
         ren[c] = new
-        labels[new] = f"{meas.capitalize()}, {STAT_LABEL[stat]} at {grid_label(sfx)} ({vlab})"
+        labels[new] = series_label(meas, stat, sfx, vlab)
     df = df.rename(columns=ren)
     frames.append(df.set_index("time"))
 
 fac = pd.read_csv("data/smoothed_factors.csv").set_index("time")
 fac.columns = [f"factor_{c[1:]}" for c in fac.columns]
 for c in fac.columns:
-    labels[c] = f"Smoothed latent factor {c.split('_')[1]} (see repository docs for ordering)"
+    k = int(c.split('_')[1])
+    labels[c] = (f"Distributional factor {k}" if k <= 8 else
+                 f"Lag {(k-9)//8+1} of distributional factor {(k-9)%8+1}" if k <= 32 else
+                 f"Aggregate factor {k-32}")
 frames.append(fac)
 
 series = pd.concat(frames, axis=1).reset_index()
@@ -68,9 +78,9 @@ mlab = {
     "year": "Year", "quarter": "Quarter (1-4)", "time": "Quarter label (YYYY-Qq)",
     "cop_share": "Copula cell probability mass (weight)",
     "grid_point": "Copula grid cell index",
-    "consum": "Consumption (relative to per-household average)",
-    "income": "Income (relative to per-household average)",
-    "wealth": "Wealth (relative to per-household average)",
+    "consum": "Consumption, decile-group mean (2019 USD per household)",
+    "income": "Income, decile-group mean (2019 USD per household)",
+    "wealth": "Wealth, decile-group mean (2019 USD per household)",
     "consumgrid": "Consumption grid coordinate (rank cell)",
     "incomegrid": "Income grid coordinate (rank cell)",
     "wealthgrid": "Wealth grid coordinate (rank cell)",

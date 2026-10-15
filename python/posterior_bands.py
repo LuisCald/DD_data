@@ -13,7 +13,7 @@ deciles; swap in whatever moment you need.
     python posterior_bands.py                              # wealth deciles, 2008-Q3
     python posterior_bands.py --measure income --date 2020-Q3 --lo 0.10 --hi 0.90
 
-Needs the factor draws (data/synthetic/smoothed_factor_draws.csv). Writes
+Needs the factor draws (data/smoothed_factor_draws.csv). Writes
 `posterior_bands_output.csv` and a plot next to this script.
 
 Dependencies: numpy, pandas, matplotlib.
@@ -71,7 +71,7 @@ def main() -> None:
     # absorbs the constant trend, R^2 ~ 1.0).
     coeff = os.path.join(SYNTH, f"{args.dataset}_coefficients_average.csv")
     fm = FactorMap(coeff, os.path.join(SYNTH, "smoothed_factors.csv"))
-    K = fm.K
+    K = fm.n_factors
 
     draws = pd.read_csv(args.draws)
     u = np.round(np.arange(0.1, 1.0, 0.1), 2)   # deciles

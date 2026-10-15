@@ -1,149 +1,102 @@
 # Distributional Dynamics — Data
 
-**Quarterly estimates of the joint distribution of consumption, income, and
-wealth for U.S. households, 1962-Q3 to 2024-Q1**, with posterior uncertainty —
-plus small scripts that turn them into whatever moment or micro dataset you
-need.
+Quarterly estimates of the joint distribution of consumption, income, and wealth for
+U.S. households, 1962-Q3 to 2024-Q1 (247 quarters), with posterior uncertainty.
 
-This is the *data product* of:
+**Vintage:** October 2026 · 8 distributional factors · Legendre order 12 · 200 posterior draws ·
+[distributionaldynamics.com](https://www.distributionaldynamics.com)
 
-> Bayer, Christian, Luis Calderon, and Moritz Kuhn. "Distributional Dynamics."
-> CEPR Discussion Paper 19829, 2026.
-
-Please cite the paper when using the data ([`CITATION.cff`](CITATION.cff)).
-Methodology, estimation code, and the full replication package live in
-[**DD_replication**](https://github.com/LuisCald/DD_replication).
-
-**Vintage (October 2026).** Estimates from the paper's replication specification
-(8 distributional factors, 11 aggregate factors), with the full innovation
-covariance (contemporaneous distribution–aggregate correlation) in the likelihood.
-This replaces the July 2026 files.
-
----
-
-## The data (`data/`)
-
-| File | What it is |
-|---|---|
-| `smoothed_factors.csv` | **Latent states** $\hat F_t$ (43 columns × 248 quarters, point estimate / posterior mode). **The first 8 columns (`x1`–`x8`) are the distributional factors — the main objects.** `x9`–`x32` are their lags (the model conditions annual surveys on 4-quarter averages), `x33`–`x43` the aggregate block. |
-| `smoothed_factor_draws.csv` | **200 posterior draws** of the states (parameter + state uncertainty), same column layout — again, `x1`–`x8` are the factors that matter. The basis for credible bands on any moment. |
-| `smoothed_factors_bands.csv` | Ready-made per-quarter 5/50/95 percentiles of each factor. |
-| `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | **Model-implied Legendre coefficients** of the joint distribution, dense across all quarters. `_normal` = HP trend re-added (use in-sample); `_average` = time-averaged trend (use for extrapolation). |
-| `{PSID,SCF}_functional_data{,_detrended}.csv` | The raw survey-based coefficient estimates that *enter* the model (NaN where no survey). |
-| `PSID_synthetic_microdata.csv` | **Synthetic micro data**: one weighted cross-section per quarter (1000 rows = 10³ decile-copula cells) — cell weight, decile-average consumption/income/wealth (relative to per-HH mean), cell indices. Exported from 1984-Q2, the first quarter in which the PSID joint distribution is available; generate other quarters or other surveys with `coefficients_to_micro_data`. |
-| `aggregate_anchors.csv` | Per-household aggregates (`consum/income/wealth_per_hh`, `tot_hhs`) — multiply relative values by these for dollar levels. |
-
-### Balance-sheet items (`data/items/`)
-
-All four items in one file: `dd_items_SCF.csv` (and `dd_items_SCF.dta`; same columns plus `item`), e.g.
-`pd.read_csv("https://www.distributionaldynamics.com/data/items/dd_items_SCF.csv")`.
-
-`{real_estate,mortgages,consumer_credit,pension}_SCF.csv` — the distribution of four
-balance-sheet items from the model's SCF reconstruction (each item estimated jointly with
-income and wealth, same specification), 1962-Q3 to 2024-Q1 (pensions from 1983-Q3).
-Long format: `date, grouping, group, mean_per_hh, share`, with three groupings:
-
-* `wealth_groups` — households ranked by **net worth**: `bottom50`, `next40`, `top10`
-  (the grouping of the Fed's Distributional Financial Accounts);
-* `income_quintiles` — households ranked by income: `0-20` … `80-100`;
-* `own_deciles` — households ranked by the item itself: `d1` … `d10`.
-
-`mean_per_hh` is the group's average holding per household in 2019Q4 dollars (item totals
-anchored to the Financial Accounts); `share` is the group's share of the item total.
-Zero holdings are modelled explicitly (a point mass at zero plus the holders' distribution),
-and group means of one variable by another are computed with the 2D maximum-entropy step
-(`docs/maxent_note.pdf`). Caveats: real estate includes non-owner-occupied property (which
-the DFA partly books under business equity); the pension total is anchored to DB+DC
-entitlements while the survey item is DC/IRA balances; between SCF waves (and especially
-before 1989, with few waves) the series are model-based interpolations, and they step when
-a new wave enters. Stocks and private business are not published: their bottom-50% holdings
-are below the resolution of the representation.
-
-**Units:** distributional values are relative to the quarter's per-household
-mean (e.g. 0.80 = 80% of mean consumption). Levels = value ×
-`<measure>_per_hh` from `aggregate_anchors.csv`.
-
-## The scripts (`julia/`, `python/`)
-
-Named for the pipeline stage they implement — same API in both languages,
-agreeing to machine precision:
-
-```
-factors  →  coefficients  →  moments / micro data
-```
-
-| Script | In → Out |
-|---|---|
-| `factors_to_coefficients` | factors → coefficient rows (`FactorMap`; perturb a factor for counterfactuals). **`_average` trend convention only** — the map is re-estimated from the published files (exact, R² = 1.0) since the model's own loadings/means/trend are not shipped; the `_normal` HP trend is not a function of the factors. |
-| `coefficients_to_moments` | coefficients → decile cuts & averages, levels, shares, robust Ginis, copula density (`DATE=all` for full time series) |
-| `coefficients_to_micro_data` | coefficients → weighted synthetic cross-sections |
-| `cross_conditional_means` | coefficients → group means of one variable within groups of another (e.g. wealth of the bottom 50% / next 40% / top 10% of income; `GROUPS=40,40,20` etc.), via a **2D maximum-entropy density** fitted to the copula coefficients — avoids the bias of the truncated Legendre series for heavy-tailed outcomes (`METHOD=series` for comparison; see [`docs/maxent_note.pdf`](docs/maxent_note.pdf)) |
-| `posterior_bands` | factor draws → credible band on any moment |
-| `plot_factor_bands` | factor draws → factor paths with bands |
-| `reconstruct` | the core library both languages share (`Reconstruction`, `quantile_at`, `copula_density_at`, `copula_pmf_grid`, `FactorMap`, …) |
-
-## Quick start
-
-**Julia** (deps pinned in `Project.toml`):
-
-```bash
-julia --project=. -e 'using Pkg; Pkg.instantiate()'   # once
-julia --project=. julia/coefficients_to_moments.jl    # deciles + copula density
-DATE=2008-Q3 julia --project=. julia/coefficients_to_micro_data.jl
-julia --project=. julia/plot_factor_bands.jl          # factors with 5–95% bands
-DATASET=SCF julia --project=. julia/cross_conditional_means.jl   # wealth by income group (max-entropy)
-```
-
-**Python** (needs `numpy`, `pandas`, `matplotlib`):
-
-```bash
-python python/coefficients_to_moments.py
-python python/posterior_bands.py --measure wealth --date 2008-Q3
-python python/cross_conditional_means.py --dataset SCF --date all --groups 50,40,10
-```
-
-**As a library:**
+## Load the data in one line
 
 ```python
-import sys; sys.path.insert(0, "python")
-from reconstruct import Reconstruction, FactorMap
-
-r = Reconstruction("data/PSID_coefficients_normal.csv")
-r.quantile_at("2008-Q3", "consum", [0.1, 0.5, 0.9])   # → [0.315, 0.805, 1.881]
-r.copula_density_at("2008-Q3", 0.5, 0.5, 0.5)          # → 2.458
-r.copula_pmf_grid("2008-Q3")                           # 10³ cell masses
+import pandas as pd
+df    = pd.read_csv("https://www.distributionaldynamics.com/data/dd_series.csv")
+items = pd.read_csv("https://www.distributionaldynamics.com/data/items/dd_items_SCF.csv")
 ```
 
 ```julia
-include("julia/reconstruct.jl"); using .DistributionalReconstruction
-r = Reconstruction("data/PSID_coefficients_normal.csv")
-quantile_at(r, "2008-Q3", :consum, [0.1, 0.5, 0.9])
+using CSV, DataFrames, Downloads
+df = CSV.read(Downloads.download("https://www.distributionaldynamics.com/data/dd_series.csv"), DataFrame)
 ```
 
-## Posterior uncertainty
+```stata
+use "https://www.distributionaldynamics.com/data/dd_series.dta", clear
+use "https://www.distributionaldynamics.com/data/items/dd_items_SCF.dta", clear
+```
 
-`smoothed_factors.csv` is the posterior mode. For bands, push each row-group of
-`smoothed_factor_draws.csv` through `FactorMap` — `posterior_bands` does this
-for you. Each draw combines parameter uncertainty (posterior θ) with the
-Kalman smoother's state uncertainty; draws are marginal per quarter (exact for
-pointwise bands and per-date moments; joint cross-date statistics would need a
-joint simulation smoother).
+## Files (`data/`)
 
-## Technical notes
+| File | Contents |
+|---|---|
+| `dd_series.{csv,dta}` | **Main file.** 247 quarters × 406 columns: decile-group means, totals and shares of consumption, income and wealth in the PSID and SCF views (plus `_dt` detrended versions), and the 43 smoothed states as `factor_1`–`factor_43`. |
+| `dd_master.{csv,dta}` | Synthetic micro data, PSID view, 1984-Q2 to 2024-Q1: 1,000 cells (10×10×10 deciles) per quarter. Cell weight `cop_share`, decile-group means `consum/income/wealth` in 2019 USD per household, and cell indices. Copy of `PSID_synthetic_microdata.csv` with `year`/`quarter` added. |
+| `items/dd_items_SCF.{csv,dta}` | Balance-sheet items: real estate, mortgages, consumer credit, pensions (pensions from 1983-Q3). There is also one CSV per item. |
+| `smoothed_factors.csv` | Posterior mode of the states. `x1`–`x8` are the distributional factors, `x9`–`x32` their lags 1–3, and `x33`–`x43` the 11 aggregate factors. |
+| `smoothed_factor_draws.csv`, `smoothed_factors_bands.csv` | 200 posterior draws (`draw, time, x1…x43`) and per-quarter 5/50/95% bands. |
+| `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | Legendre coefficients of the joint distribution, 1,730 per quarter. `_normal` adds the HP trend back (use in sample); `_average` uses the time-averaged trend (use for extrapolation and with `FactorMap`). `{PSID,SCF}_functional_data{,_detrended}.csv` are the same coefficients evaluated: copula cell masses `ciw_ijk` and decile profiles. |
+| `aggregate_anchors.csv` | Per-household consumption, income and wealth (2019 USD) and the number of households (`tot_hhs`). Dates are quarter starts (`1962-07-01` = 1962-Q3). The published range starts at 1962-Q3; rows from 1947 to 1962-Q2 are pre-sample, and the file runs to 2024-Q2. |
 
-- Marginal coefficients are stored on an asinh scale; the helpers apply the
-  sinh back-transform, so returned values are already in natural (relative)
-  units. The copula block is stored as-is.
-- Basis: orthonormal Legendre on [0,1], $Q_o(u) = \sqrt{2o+1}\,P_o(2u-1)$;
-  12 orders per margin, 12³ copula tensor (34 immutable entries reconstructed
-  by the helpers).
-- The synthetic micro data reproduces the replication pipeline's
-  `construct_micro_dataset` layout; the degree-11 basis truncates the extreme
-  wealth tail (weighted mean ≈ 0.93 of the true mean for wealth — the
-  Forbes-type top is not representable in this basis).
+## Column names
 
-## License
+`dd_series` columns follow `<var>_<stat>_<pctl>_<survey>[_dt]`:
 
-See [`LICENSE`](LICENSE). Data are model-generated estimates; underlying
-surveys (PSID, SCF, CEX, CPS, SIPP) are public — see DD_replication for
-sources and the full data availability statement.
+- `var` is `consum`, `income` or `wealth`.
+- `survey` is `psid` or `scf`. The SCF has no consumption, and the non-detrended PSID
+  series start when the PSID measures do: income in 1968, wealth in 1984, consumption in 1999.
+- `pctl` is `p10`…`p90` or `top`. Each names a decile group: `p10` is the 0–10th percentile,
+  `p90` the 80–90th, and `top` the top 10%.
+- `stat` is one of:
+  - `quantile`: the group's mean per household, in 2019 USD. (It is a group mean, not a
+    point quantile.)
+  - `level`: the group's total, in 2019 USD.
+  - `share`: the group's share of the total. The ten shares sum to 1.
+
+Items columns are `date, item, grouping, group, mean_per_hh, share`. `mean_per_hh` is in
+2019Q4 USD. There are three groupings: `wealth_groups` (bottom50/next40/top10),
+`income_quintiles` and `own_deciles`.
+
+## Scripts (`julia/`, `python/`)
+
+The two languages share the same API and agree to machine precision. The pipeline is
+factors → coefficients → moments / micro data.
+
+| Script | Does |
+|---|---|
+| `reconstruct` | Core library (`Reconstruction`, `quantile_at`, `copula_density_at`, `copula_pmf_grid`, `FactorMap`) |
+| `factors_to_coefficients` | Factors → coefficients (`_average` convention); perturb a factor for counterfactuals |
+| `coefficients_to_moments` | Decile cuts and averages, shares, Ginis, copula density |
+| `coefficients_to_micro_data` | Weighted synthetic cross-sections, relative to the per-household mean. Writes `*_output.csv` next to the script; use `--out` / `OUT=` to write elsewhere |
+| `posterior_bands`, `plot_factor_bands` | Factor draws → credible bands on a moment or on the factors |
+| `cross_conditional_means` | Means of one variable within groups of another (2D maximum entropy) |
+| `validate_reconstruction` (Python only), `tools_make_stata.py` | Consistency check against the functional data; rebuilds the `dd_*` files |
+
+```bash
+julia --project=. -e 'using Pkg; Pkg.instantiate()'                      # once
+python python/posterior_bands.py --measure wealth --date 2008-Q3          # numpy, pandas, matplotlib
+python python/cross_conditional_means.py --dataset SCF --date all --groups 50,40,10
+```
+
+## Notes
+
+- **Items:** these are model-based between SCF waves, and stocks and private business are
+  not published. See [`docs/items_notes.md`](docs/items_notes.md) for the caveats.
+- **Uncertainty:** `smoothed_factors.csv` is the posterior mode. For bands on any moment,
+  push the draws through `FactorMap` (`posterior_bands` does this).
+- **Method:** see [`docs/methods.md`](docs/methods.md) (basis, factor layout, trends) and
+  [`docs/maxent_note.pdf`](docs/maxent_note.pdf) (maximum-entropy step).
+
+## Cite
+
+```bibtex
+@techreport{BayerCalderonKuhn2026,
+  author      = {Bayer, Christian and Calderon, Luis and Kuhn, Moritz},
+  title       = {Distributional Dynamics},
+  institution = {Centre for Economic Policy Research},
+  type        = {CEPR Discussion Paper},
+  number      = {19829},
+  year        = {2026}
+}
+```
+
+MIT license ([`LICENSE`](LICENSE)). The data are model-generated estimates. Estimation code,
+sources and the replication package are in [DD_replication](https://github.com/LuisCald/DD_replication).

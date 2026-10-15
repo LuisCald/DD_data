@@ -12,7 +12,7 @@
 #   julia --project=. julia/posterior_bands.jl
 #   # optional: DATASET=PSID MEASURE=wealth DATE=2008-Q3 LO=0.05 HI=0.95 julia ...
 #
-# Needs the factor draws (data/synthetic/smoothed_factor_draws.csv), produced
+# Needs the factor draws (data/smoothed_factor_draws.csv), produced
 # by the DD_replication pipeline (export_draws.jl). Only deps: CSV, DataFrames,
 # Statistics, Plots.
 # ─────────────────────────────────────────────────────────────

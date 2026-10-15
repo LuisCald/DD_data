@@ -317,8 +317,8 @@ class FactorMap:
 
     ```python
     fm = FactorMap(
-        "data/synthetic/PSID_coefficients_average.csv",
-        "data/synthetic/smoothed_factors.csv",
+        "data/PSID_coefficients_average.csv",
+        "data/smoothed_factors.csv",
         n_factors=8,
     )
     print(fm.summary())          # T_used=247, R² median≈1.000

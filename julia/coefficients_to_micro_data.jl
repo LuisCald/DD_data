@@ -36,11 +36,14 @@
 # Values are relative to the per-household mean (the same convention as
 # `quantile_at`; e.g. 0.73 = 73% of mean consumption that quarter). The model
 # pipeline multiplies by a per-household aggregate series, shipped as
-# `data/synthetic/aggregate_anchors.csv` (time, consum_per_hh, income_per_hh,
+# `data/aggregate_anchors.csv` (time, consum_per_hh, income_per_hh,
 # wealth_per_hh, tot_hhs — the same series the estimation uses). To get
 # dollar levels, join on the quarter and compute
 #
 #   level_it = value_it × <measure>_per_hh_t
+#
+# (The published data/PSID_synthetic_microdata.csv and dd_master are already
+# scaled this way, i.e. in 2019 USD per household.)
 #
 # To expand into unit-record data (N synthetic households), sample rows with
 # probability `cop_share` (clip negatives to 0 and renormalize) and assign
@@ -49,7 +52,9 @@
 # USAGE
 #   julia --project=. coefficients_to_micro_data.jl
 #   # options: DATASET=PSID TREND=normal DATE=2008-Q3 (omit DATE for all quarters)
-#   # output:  ../../data/synthetic/<DATASET>_synthetic_microdata.csv
+#   #          OUT=path.csv to write elsewhere
+#   # output:  julia/coefficients_to_micro_data_output.csv (git-ignored; never
+#   #          overwrites the published data/ files)
 #
 # Only deps: CSV, DataFrames (wraps the canonical helper julia/reconstruct.jl).
 # Python twin: coefficients_to_micro_data.py.
@@ -96,6 +101,7 @@ function main()
     dataset = get(ENV, "DATASET", "PSID")
     trend   = get(ENV, "TREND", "normal")
     date    = get(ENV, "DATE", "")            # empty → all quarters
+    dest    = get(ENV, "OUT", joinpath(HERE, "coefficients_to_micro_data_output.csv"))
 
     csv = joinpath(REPO, "data", "$(dataset)_coefficients_$(trend).csv")
     isfile(csv) || error("Coefficient file not found: $csv")
@@ -108,7 +114,6 @@ function main()
         n % 50 == 0 && println("  $n / $(length(dates)) quarters")
     end
 
-    dest = joinpath(REPO, "data", "$(dataset)_synthetic_microdata.csv")
     CSV.write(dest, out)
     println("Wrote $(nrow(out)) rows ($(length(dates)) quarters × $(GRID^3) cells) → $dest")
 end

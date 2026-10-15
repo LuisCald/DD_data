@@ -3,8 +3,8 @@
 plot_factor_bands.py — plot the smoothed latent factors with posterior bands.
 
 Reads
-  * data/synthetic/smoothed_factor_draws.csv  (posterior draws: draw,time,x1..xR)
-  * data/synthetic/smoothed_factors.csv        (point estimate:  time,x1..xR)
+  * data/smoothed_factor_draws.csv  (posterior draws: draw,time,x1..xR)
+  * data/smoothed_factors.csv        (point estimate:  time,x1..xR)
 
 and draws each factor as a point-estimate line inside a shaded posterior band
 (default 5–95%). The draws file is produced by the Julia routine

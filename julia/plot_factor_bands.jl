@@ -2,8 +2,8 @@
 # plot_factor_bands.jl — plot the smoothed factors with posterior bands.
 #
 # Reads
-#   data/synthetic/smoothed_factor_draws.csv   (draws:  draw,time,x1..xR)
-#   data/synthetic/smoothed_factors.csv         (point:  time,x1..xR)
+#   data/smoothed_factor_draws.csv   (draws:  draw,time,x1..xR)
+#   data/smoothed_factors.csv         (point:  time,x1..xR)
 # and draws each factor as a point-estimate line inside a shaded posterior
 # band (default 5–95%). The draws file is produced by `export_factor_draws`
 # (export_draws.jl in the DD_replication repo).
