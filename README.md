@@ -14,6 +14,11 @@ Please cite the paper when using the data ([`CITATION.cff`](CITATION.cff)).
 Methodology, estimation code, and the full replication package live in
 [**DD_replication**](https://github.com/LuisCald/DD_replication).
 
+**Vintage (October 2026).** Estimates from the paper's replication specification
+(8 distributional factors, 11 aggregate factors), with the full innovation
+covariance (contemporaneous distribution–aggregate correlation) in the likelihood.
+This replaces the July 2026 files.
+
 ---
 
 ## The data (`data/`)
@@ -21,11 +26,11 @@ Methodology, estimation code, and the full replication package live in
 | File | What it is |
 |---|---|
 | `smoothed_factors.csv` | **Latent states** $\hat F_t$ (43 columns × 248 quarters, point estimate / posterior mode). **The first 8 columns (`x1`–`x8`) are the distributional factors — the main objects.** `x9`–`x32` are their lags (the model conditions annual surveys on 4-quarter averages), `x33`–`x43` the aggregate block. |
-| `smoothed_factor_draws.csv` | **400 posterior draws** of the states (parameter + state uncertainty), same column layout — again, `x1`–`x8` are the factors that matter. The basis for credible bands on any moment. |
+| `smoothed_factor_draws.csv` | **200 posterior draws** of the states (parameter + state uncertainty), same column layout — again, `x1`–`x8` are the factors that matter. The basis for credible bands on any moment. |
 | `smoothed_factors_bands.csv` | Ready-made per-quarter 5/50/95 percentiles of each factor. |
 | `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | **Model-implied Legendre coefficients** of the joint distribution, dense across all quarters. `_normal` = HP trend re-added (use in-sample); `_average` = time-averaged trend (use for extrapolation). |
 | `{PSID,SCF}_functional_data{,_detrended}.csv` | The raw survey-based coefficient estimates that *enter* the model (NaN where no survey). |
-| `PSID_synthetic_microdata.csv` | **Synthetic micro data**: one weighted cross-section per quarter (1000 rows = 10³ decile-copula cells) — cell weight, decile-average consumption/income/wealth (relative to per-HH mean), cell indices. |
+| `PSID_synthetic_microdata.csv` | **Synthetic micro data**: one weighted cross-section per quarter (1000 rows = 10³ decile-copula cells) — cell weight, decile-average consumption/income/wealth (relative to per-HH mean), cell indices. Exported from 1984-Q2, the first quarter in which the PSID joint distribution is available; generate other quarters or other surveys with `coefficients_to_micro_data`. |
 | `aggregate_anchors.csv` | Per-household aggregates (`consum/income/wealth_per_hh`, `tot_hhs`) — multiply relative values by these for dollar levels. |
 
 **Units:** distributional values are relative to the quarter's per-household
@@ -46,6 +51,7 @@ factors  →  coefficients  →  moments / micro data
 | `factors_to_coefficients` | factors → coefficient rows (`FactorMap`; perturb a factor for counterfactuals). **`_average` trend convention only** — the map is re-estimated from the published files (exact, R² = 1.0) since the model's own loadings/means/trend are not shipped; the `_normal` HP trend is not a function of the factors. |
 | `coefficients_to_moments` | coefficients → decile cuts & averages, levels, shares, robust Ginis, copula density (`DATE=all` for full time series) |
 | `coefficients_to_micro_data` | coefficients → weighted synthetic cross-sections |
+| `cross_conditional_means` | coefficients → group means of one variable within groups of another (e.g. wealth of the bottom 50% / next 40% / top 10% of income; `GROUPS=40,40,20` etc.), via a **2D maximum-entropy density** fitted to the copula coefficients — avoids the bias of the truncated Legendre series for heavy-tailed outcomes (`METHOD=series` for comparison; see [`docs/maxent_note.pdf`](docs/maxent_note.pdf)) |
 | `posterior_bands` | factor draws → credible band on any moment |
 | `plot_factor_bands` | factor draws → factor paths with bands |
 | `reconstruct` | the core library both languages share (`Reconstruction`, `quantile_at`, `copula_density_at`, `copula_pmf_grid`, `FactorMap`, …) |
@@ -59,6 +65,7 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'   # once
 julia --project=. julia/coefficients_to_moments.jl    # deciles + copula density
 DATE=2008-Q3 julia --project=. julia/coefficients_to_micro_data.jl
 julia --project=. julia/plot_factor_bands.jl          # factors with 5–95% bands
+DATASET=SCF julia --project=. julia/cross_conditional_means.jl   # wealth by income group (max-entropy)
 ```
 
 **Python** (needs `numpy`, `pandas`, `matplotlib`):
@@ -66,6 +73,7 @@ julia --project=. julia/plot_factor_bands.jl          # factors with 5–95% ban
 ```bash
 python python/coefficients_to_moments.py
 python python/posterior_bands.py --measure wealth --date 2008-Q3
+python python/cross_conditional_means.py --dataset SCF --date all --groups 50,40,10
 ```
 
 **As a library:**
@@ -75,8 +83,8 @@ import sys; sys.path.insert(0, "python")
 from reconstruct import Reconstruction, FactorMap
 
 r = Reconstruction("data/PSID_coefficients_normal.csv")
-r.quantile_at("2008-Q3", "consum", [0.1, 0.5, 0.9])   # → [0.325, 0.802, 1.874]
-r.copula_density_at("2008-Q3", 0.5, 0.5, 0.5)          # → 1.754
+r.quantile_at("2008-Q3", "consum", [0.1, 0.5, 0.9])   # → [0.315, 0.805, 1.881]
+r.copula_density_at("2008-Q3", 0.5, 0.5, 0.5)          # → 2.458
 r.copula_pmf_grid("2008-Q3")                           # 10³ cell masses
 ```
 
