@@ -35,6 +35,9 @@ This replaces the July 2026 files.
 
 ### Balance-sheet items (`data/items/`)
 
+All four items in one file: `dd_items_SCF.csv` (and `dd_items_SCF.dta`; same columns plus `item`), e.g.
+`pd.read_csv("https://www.distributionaldynamics.com/data/items/dd_items_SCF.csv")`.
+
 `{real_estate,mortgages,consumer_credit,pension}_SCF.csv` — the distribution of four
 balance-sheet items from the model's SCF reconstruction (each item estimated jointly with
 income and wealth, same specification), 1962-Q3 to 2024-Q1 (pensions from 1983-Q3).
