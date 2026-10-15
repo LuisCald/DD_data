@@ -33,6 +33,29 @@ This replaces the July 2026 files.
 | `PSID_synthetic_microdata.csv` | **Synthetic micro data**: one weighted cross-section per quarter (1000 rows = 10³ decile-copula cells) — cell weight, decile-average consumption/income/wealth (relative to per-HH mean), cell indices. Exported from 1984-Q2, the first quarter in which the PSID joint distribution is available; generate other quarters or other surveys with `coefficients_to_micro_data`. |
 | `aggregate_anchors.csv` | Per-household aggregates (`consum/income/wealth_per_hh`, `tot_hhs`) — multiply relative values by these for dollar levels. |
 
+### Balance-sheet items (`data/items/`)
+
+`{real_estate,mortgages,consumer_credit,pension}_SCF.csv` — the distribution of four
+balance-sheet items from the model's SCF reconstruction (each item estimated jointly with
+income and wealth, same specification), 1962-Q3 to 2024-Q1 (pensions from 1983-Q3).
+Long format: `date, grouping, group, mean_per_hh, share`, with three groupings:
+
+* `wealth_groups` — households ranked by **net worth**: `bottom50`, `next40`, `top10`
+  (the grouping of the Fed's Distributional Financial Accounts);
+* `income_quintiles` — households ranked by income: `0-20` … `80-100`;
+* `own_deciles` — households ranked by the item itself: `d1` … `d10`.
+
+`mean_per_hh` is the group's average holding per household in 2019Q4 dollars (item totals
+anchored to the Financial Accounts); `share` is the group's share of the item total.
+Zero holdings are modelled explicitly (a point mass at zero plus the holders' distribution),
+and group means of one variable by another are computed with the 2D maximum-entropy step
+(`docs/maxent_note.pdf`). Caveats: real estate includes non-owner-occupied property (which
+the DFA partly books under business equity); the pension total is anchored to DB+DC
+entitlements while the survey item is DC/IRA balances; between SCF waves (and especially
+before 1989, with few waves) the series are model-based interpolations, and they step when
+a new wave enters. Stocks and private business are not published: their bottom-50% holdings
+are below the resolution of the representation.
+
 **Units:** distributional values are relative to the quarter's per-household
 mean (e.g. 0.80 = 80% of mean consumption). Levels = value ×
 `<measure>_per_hh` from `aggregate_anchors.csv`.
