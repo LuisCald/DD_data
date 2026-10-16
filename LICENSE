@@ -1,13 +1,3 @@
-Copyright (c) 2026 Christian Bayer, Luis Calderon, and Moritz Kuhn
-
-The data and documentation in this repository (data/, docs/) are licensed under the
-Creative Commons Attribution 4.0 International License (CC BY 4.0),
-https://creativecommons.org/licenses/by/4.0/. The code (python/, julia/, tools_*.py) is
-licensed under the MIT License, see LICENSE-CODE.
-
-Please cite: Bayer, Christian, Luis Calderon and Moritz Kuhn (2026), "Distributional
-Dynamics", CEPR Discussion Paper 19829.
-
 Attribution 4.0 International
 
 =======================================================================
