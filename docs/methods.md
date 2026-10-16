@@ -37,20 +37,33 @@ aggregate innovations.
 ## Posterior uncertainty
 
 `smoothed_factors.csv` is the posterior mode. `smoothed_factor_draws.csv` holds 200
-draws. Each draw combines parameter uncertainty (a posterior θ draw) with the Kalman
-smoother's state uncertainty. To get a band on any moment, push each draw through
-`FactorMap` and compute the moment; `posterior_bands` does this for you. The draws are
-marginal per quarter. That is exact for pointwise bands and per-date moments; joint
-statistics across dates would need a joint simulation smoother.
+draws. Each draw combines parameter uncertainty (a posterior θ draw) with state
+uncertainty: given that θ, the whole state path is drawn from p(x_1, …, x_T | data) by
+forward-filtering backward-sampling. Draws are therefore coherent over time, so changes
+between dates within one draw carry the right uncertainty. To get a band on any moment,
+push each draw through `FactorMap` and compute the moment; `posterior_bands` does this
+for you.
 
 ## Synthetic micro data
 
 `dd_master` / `PSID_synthetic_microdata.csv` follow the replication pipeline's
 `construct_micro_dataset` layout: one row per cell of the 10×10×10 decile copula grid.
-Cell weights can be slightly negative in isolated cells, because they are model-implied.
-The degree-11 basis truncates the extreme wealth tail, so the weighted mean of wealth is
-about 0.92–0.93 of the true per-household mean. The Forbes-type top is not representable
-in this basis.
+The weight `cop_share` is the copula mass of the cell. Each of `consum`, `income` and
+`wealth` is the mean of that variable among the households in the cell,
+E[m | u_c ∈ U_i, u_y ∈ U_j, u_w ∈ U_k], integrated from the copula density and the
+quantile functions — the cell version of the group means in the paper's recession figure.
+Two safeguards: cells with copula mass below 5e-5 (about 12% of cells, 0.1% of the
+weight) carry the decile average, because their conditional mean is a ratio of
+near-zero integrals; and values the truncated copula pushes outside their own decile are
+clipped to that decile's range. In 1984–1999 the PSID has no consumption; the file then
+conditions on income and wealth only. `coefficients_to_micro_data` reproduces the file
+(`--values decile` gives the earlier layout, where each cell carried the unconditional
+decile average).
+
+The five `implicates/` files repeat this at five posterior draws (weights: the mode
+weights plus that draw's change in cell mass). The degree-11 basis truncates the extreme
+wealth tail, so the weighted mean of wealth is about 0.92–0.94 of the true per-household
+mean. The Forbes-type top is not representable in this basis.
 
 ## Group means across variables
 

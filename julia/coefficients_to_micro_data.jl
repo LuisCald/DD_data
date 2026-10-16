@@ -17,18 +17,26 @@
 #   grid_point — concatenated cell index, e.g. 372 = (consum decile 3,
 #                income decile 7, wealth decile 2); deciles are 1 (bottom)
 #                to 10 (top)
-#   consum/income/wealth — the AVERAGE of the measure within its decile,
-#                RELATIVE TO THE PER-HOUSEHOLD MEAN of that quarter
+#   consum/income/wealth — the MEAN OF THE MEASURE AMONG THE HOUSEHOLDS IN
+#                THE CELL (copula-weighted; VALUES=cell, default since Oct 2026),
+#                RELATIVE TO THE PER-HOUSEHOLD MEAN of that quarter.
+#                VALUES=decile gives the earlier layout: each cell carries the
+#                unconditional decile average of each measure
 #   *grid      — the cell indices as separate columns
 #
 # HOW IT FOLLOWS THE MODEL CODE
 # * Weights: `copula_pmf_grid` reproduces the published `ciw_*` probability
 #   masses (the copula block of the coefficient files).
-# * Values: CreateTimeSeries.jl (≈ line 2376) integrates the quantile function
-#   over each decile with quadgk and divides by the interval length. Here the
-#   same average is computed as the mean of `quantile_at` on 32 nodes per
-#   decile (the quantile function is a degree-11 polynomial in the basis, so
-#   this agrees to ~machine precision).
+# * Values (VALUES=cell): E[m | cell] = (1/w) ∫_cell sinh(Ξ⁻¹_m(u_m)) c(u) du.
+#   The copula density is a Legendre polynomial, so this factors into
+#   one-dimensional integrals per decile — the cell version of
+#   RecessionPanels.box_conditional_means, which the paper's recession figure
+#   uses. Gauss–Legendre (64 nodes per decile) on the outcome side, closed form
+#   on the conditioning side. Cells with mass below MIN_CELL_MASS fall back to the
+#   decile average; values a truncated copula pushes outside their own decile
+#   are clipped at its bounds. A quarter without the consumption marginal
+#   conditions on (income, wealth) only.
+# * Values (VALUES=decile): the decile average of each measure (32 nodes).
 # * Row layout: identical to `construct_micro_dataset` (Correlations.jl),
 #   including the concatenated `grid_point` index.
 #
@@ -52,6 +60,7 @@
 # USAGE
 #   julia --project=. coefficients_to_micro_data.jl
 #   # options: DATASET=PSID TREND=normal DATE=2008-Q3 (omit DATE for all quarters)
+#   #          VALUES=cell (default) | decile
 #   #          OUT=path.csv to write elsewhere
 #   # output:  julia/coefficients_to_micro_data_output.csv (git-ignored; never
 #   #          overwrites the published data/ files)
@@ -65,7 +74,8 @@ const REPO = abspath(joinpath(HERE, ".."))
 
 include(joinpath(HERE, "reconstruct.jl"))
 using .DistributionalReconstruction
-using CSV, DataFrames, Statistics
+using CSV, DataFrames, Statistics, LinearAlgebra
+const DR = DistributionalReconstruction
 
 const MEASURES = [:consum, :income, :wealth]   # alphabetical — model convention
 const GRID = 10
@@ -81,17 +91,78 @@ function decile_averages(r, date, measure)
     return avgs
 end
 
+# Gauss–Legendre nodes/weights on [-1, 1] (Golub–Welsch)
+function _gauss_legendre(n)
+    β = [k / sqrt(4k^2 - 1) for k in 1:n-1]
+    E = eigen(SymTridiagonal(zeros(n), β))
+    return E.values, 2 .* E.vectors[1, :] .^ 2
+end
+const GL_X, GL_W = _gauss_legendre(64)
+const EDGES = collect(0:GRID) ./ GRID
+# below this copula mass a cell's conditional mean is numerically unstable (ratio of
+# near-zero integrals); it carries the decile average instead (≈12% of cells, ≈0.1% of weight)
+const MIN_CELL_MASS = 5e-5
+
+"Mean of each measure among the households in each 10×10×10 cell (see header)."
+function cell_means(r, date)
+    κ = DR._kappa(r, date)
+    K = size(κ, 1)
+    U = [(EDGES[d] + EDGES[d+1]) / 2 + x / (2GRID) for d in 1:GRID, x in GL_X]      # (10, n)
+    Wq = repeat((GL_W ./ (2GRID))', GRID)
+    Iint = [I_m(o, [EDGES[d+1]])[1] - I_m(o, [EDGES[d]])[1] for o in 0:K-1, d in 1:GRID]   # (12, 10)
+    has = Dict(m => !all(isnan, DR._xi(r, date, m)) for m in MEASURES)
+    if !has[:consum]
+        κ = copy(κ); κ[2:end, :, :] .= 0.0     # only the (income, wealth) slice is defined
+    end
+    Ic = has[:consum] ? Iint : repeat([o == 0 ? 1.0 : 0.0 for o in 0:K-1], 1, GRID)  # integrate consumption out
+    side = Dict(:consum => Ic, :income => Iint, :wealth => Iint)
+    contract(A, B, C) = [sum(κ[a, b, c] * A[a, i] * B[b, j] * C[c, k] for a in 1:K, b in 1:K, c in 1:K)
+                         for i in 1:GRID, j in 1:GRID, k in 1:GRID]
+    mass = contract(side[:consum], side[:income], side[:wealth])
+    out = Dict{Symbol,Any}()
+    for (mi, m) in enumerate(MEASURES)
+        if !has[m]
+            out[m] = nothing
+            continue
+        end
+        f = reshape(quantile_at(r, date, m, vec(U)), size(U))
+        dec = vec(sum(f .* Wq; dims = 2)) .* GRID
+        F = [sum(Q_m(a - 1, U[d, :]) .* f[d, :] .* Wq[d, :]) for a in 1:K, d in 1:GRID]
+        mats = [side[:consum], side[:income], side[:wealth]]
+        mats[mi] = F
+        num = contract(mats...)
+        # range the quantile function spans within each decile (the fitted function
+        # need not be monotone near an atom, e.g. zero wealth)
+        lo, hi = vec(minimum(f; dims = 2)), vec(maximum(f; dims = 2))
+        v = similar(num)
+        for I in CartesianIndices(num)
+            d = I[mi]
+            v[I] = mass[I] > MIN_CELL_MASS ? clamp(num[I] / mass[I], lo[d], hi[d]) : dec[d]
+        end
+        out[m] = v
+    end
+    return out
+end
+
+"Decile-average layout (VALUES=decile): each cell carries the decile averages."
+function _decile_values(r, date)
+    q = Dict(m => decile_averages(r, date, m) for m in MEASURES)
+    return Dict(m => [q[m][(i, j, k)[mi]] for i in 1:GRID, j in 1:GRID, k in 1:GRID]
+                for (mi, m) in enumerate(MEASURES))
+end
+
 "One quarter's synthetic cross-section (1000 rows) in the model's layout."
-function micro_rows(r, date; digits = 6)
+function micro_rows(r, date; digits = 6, values = "cell")
     pmf = copula_pmf_grid(r, date)                       # 10×10×10, matches ciw_*
-    q = Dict(m => round.(decile_averages(r, date, m); digits) for m in MEASURES)
+    vals = values == "cell" ? cell_means(r, date) : _decile_values(r, date)
+    val(m, i, j, k) = vals[m] === nothing ? NaN : round(vals[m][i, j, k]; digits)
     df = DataFrame(cop_share = Float64[], grid_point = Int[],
                    consum = Float64[], income = Float64[], wealth = Float64[],
                    consumgrid = Int[], incomegrid = Int[], wealthgrid = Int[])
     for i in 1:GRID, j in 1:GRID, k in 1:GRID            # same order as construct_micro_dataset
         push!(df, (round(pmf[i, j, k]; digits),
                    parse(Int, string(i) * string(j) * string(k)),
-                   q[:consum][i], q[:income][j], q[:wealth][k], i, j, k))
+                   val(:consum, i, j, k), val(:income, i, j, k), val(:wealth, i, j, k), i, j, k))
     end
     df[!, :time] .= date
     return df
@@ -102,6 +173,7 @@ function main()
     trend   = get(ENV, "TREND", "normal")
     date    = get(ENV, "DATE", "")            # empty → all quarters
     dest    = get(ENV, "OUT", joinpath(HERE, "coefficients_to_micro_data_output.csv"))
+    values  = get(ENV, "VALUES", "cell")      # cell (default) | decile
 
     csv = joinpath(REPO, "data", "$(dataset)_coefficients_$(trend).csv")
     isfile(csv) || error("Coefficient file not found: $csv")
@@ -110,7 +182,7 @@ function main()
     dates = isempty(date) ? available_dates(r) : [date]
     out = DataFrame()
     for (n, d) in enumerate(dates)
-        append!(out, micro_rows(r, d))
+        append!(out, micro_rows(r, d; values))
         n % 50 == 0 && println("  $n / $(length(dates)) quarters")
     end
 
