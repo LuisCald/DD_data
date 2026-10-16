@@ -140,7 +140,8 @@ Method details: [`docs/methods.md`](docs/methods.md).
 }
 ```
 
-MIT license ([`LICENSE`](LICENSE)). The data are model-generated estimates. Questions and
+Data and documentation: [CC BY 4.0](LICENSE) (use freely, with attribution: cite the paper).
+Code: MIT ([`LICENSE-CODE`](LICENSE-CODE)). The data are model-generated estimates. Questions and
 problems: [GitHub issues](https://github.com/LuisCald/DD_data/issues) or
 luis.calderon@uni-bonn.de. Estimation code, sources and the processed survey data are in
 [DD_replication](https://github.com/LuisCald/DD_replication).

@@ -76,11 +76,13 @@ series.to_stata("data/dd_series.dta", write_index=False, version=118,
 # ── dd_master (microdata) ────────────────────────────────────────────────────
 def tidy_micro(df):
     """Integer cell keys; zero (not missing) weight on the nine duplicate copies of each
-    (income, wealth) cell in quarters without consumption (1984-Q2 to 1999-Q1)."""
+    (income, wealth) cell in quarters without consumption (1984-Q2 to 1999-Q1); consumption
+    floored at 0 (a few near-zero cells dip slightly below it)."""
     for c in ["grid_point", "consumgrid", "incomegrid", "wealthgrid"]:
         df[c] = df[c].astype(int)
     df["cop_share"] = df["cop_share"].fillna(0.0)
-    return add_tq(df)
+    df["consum"] = df["consum"].clip(lower=0.0)
+    return df if "year" in df.columns else add_tq(df)
 
 micro = tidy_micro(pd.read_csv("data/PSID_synthetic_microdata.csv"))
 micro.drop(columns=["year", "quarter"]).to_csv("data/PSID_synthetic_microdata.csv", index=False)
@@ -108,9 +110,7 @@ print("csv twins written")
 # ── implicates: same cleanup, plus year/quarter ─────────────────────────────
 import glob
 for f in sorted(glob.glob("data/implicates/PSID_synthetic_microdata_imp*.csv")):
-    imp = pd.read_csv(f)
-    if "year" not in imp.columns:
-        imp = tidy_micro(imp)
+    imp = tidy_micro(pd.read_csv(f))
     imp.to_csv(f, index=False)
 print("implicates cleaned")
 
@@ -121,6 +121,14 @@ ITEMS = ["real_estate", "mortgages", "consumer_credit", "pension", "stocks"]
 parts = []
 for it in ITEMS:
     d = pd.read_csv(f"data/items/{it}_SCF.csv").rename(columns={"date": "time"})
+    # holdings are non-negative: deciles inside the mass of zero holders can dip slightly
+    # below 0 (at most a few hundred dollars); floor at 0 and renormalize those shares
+    neg = d.mean_per_hh < 0
+    if neg.any():
+        d.loc[neg, ["mean_per_hh", "share"]] = 0.0
+        key = ["time", "grouping"]
+        bad = d.set_index(key).index.isin(d.loc[neg, key].drop_duplicates().set_index(key).index)
+        d.loc[bad, "share"] = d.loc[bad, "share"] / d[bad].groupby(key).share.transform("sum")
     d.to_csv(f"data/items/{it}_SCF.csv", index=False, float_format="%.6g")
     parts.append(d.assign(item=it))
 items = pd.concat(parts, ignore_index=True)[["time", "item", "grouping", "group", "mean_per_hh", "share"]]

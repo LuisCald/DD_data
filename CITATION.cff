@@ -15,7 +15,7 @@ authors:
   - family-names: "Kuhn"
     given-names: "Moritz"
     affiliation: "University of Mannheim, CEPR, IZA, CESifo"
-license: MIT
+license: CC-BY-4.0
 repository: "https://github.com/LuisCald/DD_data"
 url: "https://www.distributionaldynamics.com"
 keywords:

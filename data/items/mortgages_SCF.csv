@@ -1607,8 +1607,8 @@ time,grouping,group,mean_per_hh,share
 1993-Q2,own_deciles,d10,312207,0.577486
 1993-Q3,own_deciles,d10,313658,0.574197
 1993-Q4,own_deciles,d10,313092,0.570942
-1994-Q1,own_deciles,d10,313893,0.567736
-1994-Q2,own_deciles,d10,314197,0.564592
+1994-Q1,own_deciles,d10,313893,0.567728
+1994-Q2,own_deciles,d10,314197,0.56458
 1994-Q3,own_deciles,d10,313195,0.561526
 1994-Q4,own_deciles,d10,313901,0.55855
 1995-Q1,own_deciles,d10,312099,0.555676
@@ -2842,8 +2842,8 @@ time,grouping,group,mean_per_hh,share
 1993-Q2,own_deciles,d6,0,0
 1993-Q3,own_deciles,d6,0,0
 1993-Q4,own_deciles,d6,0,0
-1994-Q1,own_deciles,d6,-7.48261,-1.35337e-05
-1994-Q2,own_deciles,d6,-11.6115,-2.08652e-05
+1994-Q1,own_deciles,d6,0,0
+1994-Q2,own_deciles,d6,0,0
 1994-Q3,own_deciles,d6,10.4813,1.8792e-05
 1994-Q4,own_deciles,d6,54.8801,9.76527e-05
 1995-Q1,own_deciles,d6,117.666,0.000209499
@@ -3089,8 +3089,8 @@ time,grouping,group,mean_per_hh,share
 1993-Q2,own_deciles,d7,20619.2,0.038139
 1993-Q3,own_deciles,d7,21542.9,0.0394375
 1993-Q4,own_deciles,d7,22347.7,0.0407524
-1994-Q1,own_deciles,d7,23275,0.0420973
-1994-Q2,own_deciles,d7,24181.4,0.0434526
+1994-Q1,own_deciles,d7,23275,0.0420967
+1994-Q2,own_deciles,d7,24181.4,0.0434517
 1994-Q3,own_deciles,d7,24975.2,0.044778
 1994-Q4,own_deciles,d7,25897.7,0.0460819
 1995-Q1,own_deciles,d7,26606.1,0.0473708
@@ -3336,8 +3336,8 @@ time,grouping,group,mean_per_hh,share
 1993-Q2,own_deciles,d8,70656.3,0.130692
 1993-Q3,own_deciles,d8,72124.6,0.132035
 1993-Q4,own_deciles,d8,73138.1,0.133372
-1994-Q1,own_deciles,d8,74472.1,0.134697
-1994-Q2,own_deciles,d8,75687.4,0.136006
+1994-Q1,own_deciles,d8,74472.1,0.134695
+1994-Q2,own_deciles,d8,75687.4,0.136003
 1994-Q3,own_deciles,d8,76575.5,0.137292
 1994-Q4,own_deciles,d8,77864.7,0.138551
 1995-Q1,own_deciles,d8,78506.5,0.139777
@@ -3583,8 +3583,8 @@ time,grouping,group,mean_per_hh,share
 1993-Q2,own_deciles,d9,137149,0.253683
 1993-Q3,own_deciles,d9,138929,0.25433
 1993-Q4,own_deciles,d9,139800,0.254934
-1994-Q1,own_deciles,d9,141253,0.255484
-1994-Q2,own_deciles,d9,142448,0.25597
+1994-Q1,own_deciles,d9,141253,0.25548
+1994-Q2,own_deciles,d9,142448,0.255965
 1994-Q3,own_deciles,d9,143000,0.256385
 1994-Q4,own_deciles,d9,144274,0.256719
 1995-Q1,own_deciles,d9,144327,0.256967

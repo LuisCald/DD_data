@@ -1538,8 +1538,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d10,74712.1,0.553511
 1976-Q2,own_deciles,d10,75184.3,0.552636
 1976-Q3,own_deciles,d10,75137.2,0.551902
-1976-Q4,own_deciles,d10,75568.6,0.55133
-1977-Q1,own_deciles,d10,75644.7,0.550941
+1976-Q4,own_deciles,d10,75568.6,0.551325
+1977-Q1,own_deciles,d10,75644.7,0.550937
 1977-Q2,own_deciles,d10,77228.6,0.550753
 1977-Q3,own_deciles,d10,78712.4,0.550781
 1977-Q4,own_deciles,d10,79981.4,0.552709
@@ -2279,8 +2279,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d4,0,0
 1976-Q2,own_deciles,d4,0,0
 1976-Q3,own_deciles,d4,0,0
-1976-Q4,own_deciles,d4,-1.29135,-9.42138e-06
-1977-Q1,own_deciles,d4,-0.90488,-6.59049e-06
+1976-Q4,own_deciles,d4,0,0
+1977-Q1,own_deciles,d4,0,0
 1977-Q2,own_deciles,d4,3.74699,2.67215e-05
 1977-Q3,own_deciles,d4,11.9581,8.36753e-05
 1977-Q4,own_deciles,d4,12.0597,8.33382e-05
@@ -2526,8 +2526,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d5,693.169,0.0051354
 1976-Q2,own_deciles,d5,746.288,0.00548552
 1976-Q3,own_deciles,d5,796.388,0.00584967
-1976-Q4,own_deciles,d5,854.937,0.00623741
-1977-Q1,own_deciles,d5,909.895,0.00662701
+1976-Q4,own_deciles,d5,854.937,0.00623735
+1977-Q1,own_deciles,d5,909.895,0.00662696
 1977-Q2,own_deciles,d5,981.557,0.00699993
 1977-Q3,own_deciles,d5,1052.17,0.00736242
 1977-Q4,own_deciles,d5,1058.79,0.00731671
@@ -2773,8 +2773,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d6,3646.6,0.0270162
 1976-Q2,own_deciles,d6,3739.89,0.0274897
 1976-Q3,own_deciles,d6,3804.91,0.027948
-1976-Q4,own_deciles,d6,3891.19,0.0283892
-1977-Q1,own_deciles,d6,3955.84,0.0288115
+1976-Q4,own_deciles,d6,3891.19,0.0283889
+1977-Q1,own_deciles,d6,3955.84,0.0288113
 1977-Q2,own_deciles,d6,4096.39,0.0292132
 1977-Q3,own_deciles,d6,4229.12,0.0295928
 1977-Q4,own_deciles,d6,4251.41,0.0293793
@@ -3020,8 +3020,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d7,8759.29,0.0648939
 1976-Q2,own_deciles,d7,8879.48,0.0652678
 1976-Q3,own_deciles,d7,8933.53,0.0656191
-1976-Q4,own_deciles,d7,9038.71,0.0659443
-1977-Q1,own_deciles,d7,9094.84,0.0662403
+1976-Q4,own_deciles,d7,9038.71,0.0659436
+1977-Q1,own_deciles,d7,9094.84,0.0662398
 1977-Q2,own_deciles,d7,9325.42,0.0665038
 1977-Q3,own_deciles,d7,9536.7,0.0667319
 1977-Q4,own_deciles,d7,9608.83,0.0664015
@@ -3267,8 +3267,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d8,17114.8,0.126796
 1976-Q2,own_deciles,d8,17269.9,0.126941
 1976-Q3,own_deciles,d8,17296.5,0.127047
-1976-Q4,own_deciles,d8,17422.2,0.127109
-1977-Q1,own_deciles,d8,17453.5,0.127119
+1976-Q4,own_deciles,d8,17422.2,0.127108
+1977-Q1,own_deciles,d8,17453.5,0.127118
 1977-Q2,own_deciles,d8,17818.5,0.127072
 1977-Q3,own_deciles,d8,18144.3,0.126963
 1977-Q4,own_deciles,d8,18297.6,0.126445
@@ -3514,8 +3514,8 @@ time,grouping,group,mean_per_hh,share
 1976-Q1,own_deciles,d9,30052.7,0.222648
 1976-Q2,own_deciles,d9,30226.9,0.22218
 1976-Q3,own_deciles,d9,30173.8,0.221634
-1976-Q4,own_deciles,d9,30291.5,0.221
-1977-Q1,own_deciles,d9,30243,0.220268
+1976-Q4,own_deciles,d9,30291.5,0.220998
+1977-Q1,own_deciles,d9,30243,0.220266
 1977-Q2,own_deciles,d9,30769.6,0.219432
 1977-Q3,own_deciles,d9,31223.8,0.218485
 1977-Q4,own_deciles,d9,31497.9,0.217665

@@ -38,6 +38,8 @@ wealth group) come from the 2D maximum-entropy step (see [`methods.md`](methods.
   balances.
 - Between SCF waves the series are model-based interpolations. This matters most before
   1989, when there are few waves. The series step when a new wave enters.
+- Small negative group means (deciles inside the mass of zero holders, at most a few hundred
+  dollars) are set to 0, and those shares renormalized.
 - Stocks: only the `next40` and `top10` wealth groups are published. Bottom-50% stock
   holdings are below the resolution of the representation, and the shares are of the
   model's item total. Private business is not published.

@@ -8,4 +8,6 @@
 - Balance-sheet items: real estate, mortgages, consumer credit, pensions, and stocks (next 40 / top 10).
 - Cleanup: integer cell keys, weight 0 (not missing) on the empty consumption cells before 1999-Q2,
   `year`/`quarter` in the implicates, empty SCF consumption columns dropped from `dd_series`,
-  anchors start in 1962, items use `time` like the other files.
+  anchors start in 1962, items use `time` like the other files; small negative item means and
+  two near-zero consumption cells set to 0.
+- License: data CC BY 4.0, code MIT.
