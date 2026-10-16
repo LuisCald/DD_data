@@ -56,6 +56,6 @@ Dollar values are 2019Q4 USD (CPI-U) per household unless noted. `time` is `YYYY
 | `smoothed_factors.csv` | `time`, `x1`…`x43` (1–8 distributional factors, 9–32 their lags 1–3, 33–43 aggregate factors) |
 | `smoothed_factor_draws.csv` | `draw` (1–200), `time`, `x1`…`x43` |
 | `smoothed_factors_bands.csv` | `time`, `xK_p05`, `xK_p50`, `xK_p95` |
-| `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | `time`, `x1`…`x1730`: 3 × 12 marginal coefficients (asinh scale), then 12³ − 34 copula coefficients |
+| `{PSID,SCF,CEX,CPS,CPS2,SIPP1,SIPP2,SIPP3}_coefficients_{normal,average}.csv` | `time`, `x1`…`x1730`: 3 × 12 marginal coefficients (asinh scale), then 12³ − 34 copula coefficients |
 | `{PSID,SCF}_functional_data{,_detrended}.csv` | `time`; `ciw_ijk` copula cell masses; `{quantiles,levels,shares}<var>_<u>` decile profiles relative to the per-household mean (`u` = upper edge, `0.999999` = top) |
 | `aggregate_anchors.csv` | `time` (quarter start date), `consum_per_hh`, `income_per_hh`, `wealth_per_hh`, `tot_hhs` (number of households) |

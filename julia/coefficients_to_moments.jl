@@ -20,7 +20,7 @@
 #
 # Usage:
 #   julia --project=. julia/coefficients_to_moments.jl
-#   # options: DATASET=PSID|SCF|CEX  TREND=normal|average  DATE=2008-Q3|all
+#   # options: DATASET=PSID|SCF|CEX|CPS|CPS2|SIPP1|SIPP2|SIPP3  TREND=normal|average  DATE=2008-Q3|all
 #
 # Output: julia/coefficients_to_moments_output.csv, long format
 #   date, measure, stat, index, value

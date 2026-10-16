@@ -150,7 +150,7 @@ def micro_rows(r: Reconstruction, date: str, digits: int = 6, values: str = "cel
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
+    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX", "CPS", "CPS2", "SIPP1", "SIPP2", "SIPP3"])
     ap.add_argument("--trend", default="normal", choices=["normal", "average"])
     ap.add_argument("--date", default=None, help="one quarter, e.g. 2008-Q3; omit for all")
     ap.add_argument("--values", default="cell", choices=["cell", "decile"],

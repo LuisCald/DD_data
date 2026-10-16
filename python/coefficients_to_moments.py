@@ -114,7 +114,7 @@ def moments_for_date(r, anchors, date, verbose=True):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
+    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX", "CPS", "CPS2", "SIPP1", "SIPP2", "SIPP3"])
     ap.add_argument("--trend", default="normal", choices=["normal", "average"])
     ap.add_argument("--date", default="2008-Q3", help="a quarter, or 'all'")
     args = ap.parse_args()

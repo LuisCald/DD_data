@@ -46,7 +46,7 @@ def fit(dataset: str = "PSID") -> FactorMap:
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
+    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX", "CPS", "CPS2", "SIPP1", "SIPP2", "SIPP3"])
     args = ap.parse_args()
 
     fm = fit(args.dataset)

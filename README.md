@@ -99,7 +99,7 @@ published for `next40` and `top10` only. Private business is not published. See
 |---|---|
 | `smoothed_factors.csv` | Posterior mode of the 43 states: `x1`–`x8` distributional factors, `x9`–`x32` their lags 1–3, `x33`–`x43` the 11 aggregate factors. The factors are latent and have no economic labels. |
 | `smoothed_factor_draws.csv`, `smoothed_factors_bands.csv` | 200 posterior draws of the state path (`draw, time, x1…x43`) and 5/50/95% bands. |
-| `{PSID,SCF,CEX}_coefficients_{normal,average}.csv` | Legendre coefficients, 1,730 per quarter. `_normal` includes the HP trend (use in sample); `_average` uses the time-averaged trend (use for counterfactuals and with `FactorMap`). Blocks a survey does not measure are empty (e.g. the SCF and CEX have no 3D copula). |
+| `{PSID,SCF,CEX,CPS,CPS2,SIPP1,SIPP2,SIPP3}_coefficients_{normal,average}.csv` | Legendre coefficients, 1,730 per quarter, for each survey view. `_normal` includes the HP trend (use in sample); `_average` uses the time-averaged trend (use for counterfactuals and with `FactorMap`). Blocks a survey does not measure are empty: the CPS views have income only (CPS2 = income years 1967–1992, CPS = 1993 on); the SIPP views income and wealth (SIPP1 = panels 1984–1993, SIPP2 = panels 1996–2008, SIPP3 = the 2014 panel and later releases); only the PSID has the 3D copula. |
 | `{PSID,SCF}_functional_data{,_detrended}.csv` | The coefficients evaluated: copula cell masses `ciw_ijk` and decile profiles. |
 | `aggregate_anchors.csv` | Per-household consumption, income and wealth and the number of households (`tot_hhs`), 1962–2024. Dates are quarter starts (`1962-07-01` = 1962-Q3). |
 | `PSID_synthetic_microdata.csv` | `dd_master` without `year`/`quarter` (the layout the scripts write). |

@@ -11,3 +11,4 @@
   anchors start in 1962, items use `time` like the other files; small negative item means and
   two near-zero consumption cells set to 0.
 - License: data CC BY 4.0, code MIT.
+- Legendre coefficients for the CPS (CPS, CPS2) and SIPP (SIPP1–3) views; the scripts accept these datasets.

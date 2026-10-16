@@ -194,7 +194,7 @@ def load_anchors():
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
+    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX", "CPS", "CPS2", "SIPP1", "SIPP2", "SIPP3"])
     ap.add_argument("--kind", default="normal", choices=["normal", "average"])
     ap.add_argument("--date", default="2019-Q4", help="YYYY-Qq or 'all'")
     ap.add_argument("--groups", default="50,40,10", help="group sizes in percent, e.g. 50,40,10 or 40,40,20")

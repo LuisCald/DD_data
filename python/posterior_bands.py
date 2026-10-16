@@ -53,7 +53,7 @@ def factors_4q_for_draw(sub: pd.DataFrame, date: str, K: int) -> np.ndarray | No
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX"])
+    ap.add_argument("--dataset", default="PSID", choices=["PSID", "SCF", "CEX", "CPS", "CPS2", "SIPP1", "SIPP2", "SIPP3"])
     ap.add_argument("--measure", default="wealth", choices=["consum", "income", "wealth"])
     ap.add_argument("--date", default="2008-Q3")
     ap.add_argument("--draws", default=os.path.join(SYNTH, "smoothed_factor_draws.csv"))
