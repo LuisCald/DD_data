@@ -51,7 +51,7 @@
 #   level_it = value_it × <measure>_per_hh_t
 #
 # (The published data/PSID_synthetic_microdata.csv and dd_master are already
-# scaled this way, i.e. in 2019 USD per household.)
+# scaled this way, i.e. in 2019Q4 USD (CPI-U) per household.)
 #
 # To expand into unit-record data (N synthetic households), sample rows with
 # probability `cop_share` (clip negatives to 0 and renormalize) and assign
@@ -151,9 +151,28 @@ function _decile_values(r, date)
                 for (mi, m) in enumerate(MEASURES))
 end
 
+"10×10 (income, wealth) cell masses from the copula's consumption-free slice κ[1, :, :]."
+function income_wealth_pmf(r, date)
+    k2 = replace(DR._kappa(r, date)[1, :, :], NaN => 0.0)
+    K = size(k2, 1)
+    Imat = [I_m(o, [EDGES[d+1]])[1] for o in 0:K-1, d in 1:GRID]
+    pad = zeros(GRID + 1, GRID + 1)
+    pad[2:end, 2:end] = Imat' * k2 * Imat
+    pmf = pad[2:end, 2:end] .- pad[1:end-1, 2:end] .- pad[2:end, 1:end-1] .+ pad[1:end-1, 1:end-1]
+    pmf[pmf .< 0] .= 0.0
+    return pmf ./ sum(pmf)
+end
+
 "One quarter's synthetic cross-section (1000 rows) in the model's layout."
 function micro_rows(r, date; digits = 6, values = "cell")
-    pmf = copula_pmf_grid(r, date)                       # 10×10×10, matches ciw_*
+    if all(isnan, DR._xi(r, date, :consum))
+        # no consumption marginal: the (income, wealth) cells sit in the consumgrid == 1
+        # rows; the other nine copies carry weight 0
+        pmf = zeros(GRID, GRID, GRID)
+        pmf[1, :, :] = income_wealth_pmf(r, date)
+    else
+        pmf = copula_pmf_grid(r, date)                   # 10×10×10, matches ciw_*
+    end
     vals = values == "cell" ? cell_means(r, date) : _decile_values(r, date)
     val(m, i, j, k) = vals[m] === nothing ? NaN : round(vals[m][i, j, k]; digits)
     df = DataFrame(cop_share = Float64[], grid_point = Int[],

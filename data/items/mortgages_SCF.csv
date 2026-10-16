@@ -1,4 +1,4 @@
-date,grouping,group,mean_per_hh,share
+time,grouping,group,mean_per_hh,share
 1962-Q3,income_quintiles,0-20,5343.35,0.041672
 1962-Q4,income_quintiles,0-20,5341.27,0.0409902
 1963-Q1,income_quintiles,0-20,5333.02,0.0402137

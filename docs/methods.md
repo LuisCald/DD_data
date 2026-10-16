@@ -58,16 +58,20 @@ near-zero integrals; and values the truncated copula pushes outside their own de
 clipped to that decile's range. In 1984–1999 the PSID has no consumption; the file then
 conditions on income and wealth only. `coefficients_to_micro_data` reproduces the file
 (`--values decile` gives the earlier layout, where each cell carried the unconditional
-decile average).
+decile average). In those quarters the (income, wealth) cells sit in the rows with
+`consumgrid == 1`; the nine other copies of each cell carry weight 0 and `consum` is empty.
 
 The five `implicates/` files repeat this at five posterior draws (weights: the mode
-weights plus that draw's change in cell mass). The degree-11 basis truncates the extreme
-wealth tail, so the weighted mean of wealth is about 0.92–0.94 of the true per-household
-mean. The Forbes-type top is not representable in this basis.
+weights plus that draw's change in cell mass). The 12-term (degree-11) basis truncates the extreme
+wealth tail, so the weighted mean of wealth is typically 0.94–0.98 of the per-household
+aggregate (median 0.96). The Forbes-type top is not representable in this basis.
 
 ## Group means across variables
 
 `cross_conditional_means` computes group means of one variable within groups of another
 from a 2D maximum-entropy density fitted to the copula coefficients. This avoids the bias
 of the truncated Legendre series for heavy-tailed outcomes. `METHOD=series` gives the
-series version for comparison. See [`maxent_note.pdf`](maxent_note.pdf).
+series version for comparison. This is the recommended method for group means across
+variables, and it is what `dd_tidy_long.csv` and the balance-sheet items use. Group means
+computed from the synthetic micro data cells are close but not identical, because the
+cells are coarser (deciles) and the cell values inherit the truncated series.

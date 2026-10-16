@@ -21,7 +21,7 @@ means come out within about 1% (wealth by income) to a few percent (very
 concentrated items). The fit is a damped Newton method on the convex dual with
 a small ridge (eps) so it converges even when the smoothed coefficients are not
 exactly the moments of a positive density. --method series gives the truncated
-series for comparison. See docs/maxent_note.pdf.
+series for comparison (see docs/methods.md).
 
     python python/cross_conditional_means.py                                 # PSID, 2019-Q4
     python python/cross_conditional_means.py --dataset SCF --date all
@@ -169,6 +169,8 @@ def group_labels(edges):
     for i in range(n):
         width = round(100 * (edges[i + 1] - edges[i]))
         out.append(("bot" if i == 0 else "top" if i == n - 1 else "mid") + str(width))
+    if len(set(out)) < n:  # e.g. quintiles: name groups by percentile range, p0-20 ... p80-100
+        out = [f"p{round(100 * edges[i])}-{round(100 * edges[i + 1])}" for i in range(n)]
     return out
 
 

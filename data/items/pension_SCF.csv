@@ -1,4 +1,4 @@
-date,grouping,group,mean_per_hh,share
+time,grouping,group,mean_per_hh,share
 1983-Q3,income_quintiles,0-20,2966.64,0.00760201
 1983-Q4,income_quintiles,0-20,3161.69,0.00797763
 1984-Q1,income_quintiles,0-20,3250.64,0.00817097

@@ -13,7 +13,7 @@
 # outcomes (SCF 2019 microdata: wealth by middle-40% income −9% with the
 # series, within ±1% with max-entropy). Damped Newton on the convex dual with
 # a small ridge ε, so it converges even if the smoothed coefficients are not
-# exactly the moments of a positive density. See docs/maxent_note.pdf; the
+# exactly the moments of a positive density. See docs/methods.md; the
 # python/cross_conditional_means.py is the twin.
 #
 #   julia --project=. julia/cross_conditional_means.jl
@@ -124,7 +124,9 @@ end
 
 function group_labels(edges)
     n = length(edges) - 1
-    [(i == 1 ? "bot" : i == n ? "top" : "mid") * string(round(Int, 100 * (edges[i+1] - edges[i]))) for i in 1:n]
+    out = [(i == 1 ? "bot" : i == n ? "top" : "mid") * string(round(Int, 100 * (edges[i+1] - edges[i]))) for i in 1:n]
+    # e.g. quintiles: name groups by percentile range, p0-20 ... p80-100
+    allunique(out) ? out : ["p$(round(Int, 100 * edges[i]))-$(round(Int, 100 * edges[i+1]))" for i in 1:n]
 end
 
 function group_means(r, date, cond, out, edges, g, method, warm)

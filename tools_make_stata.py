@@ -22,7 +22,7 @@ def grid_name(sfx):
     return "top" if abs(sfx - 0.999999) < 1e-9 else f"p{int(round(sfx*100))}"
 
 def series_label(meas, stat, sfx, vlab):
-    """Variable label. All three stats are DECILE-GROUP values (2019 USD):
+    """Variable label. All three stats are DECILE-GROUP values (2019Q4 USD, CPI-U):
     `quantiles` = mean per household of the group, `levels` = group total,
     `shares` = group share of the total (the ten shares sum to 1).
     p10 = group 0-10th pct, ..., p90 = 80-90th pct, top = top 10%."""
@@ -65,6 +65,8 @@ for c in fac.columns:
 frames.append(fac)
 
 series = pd.concat(frames, axis=1).reset_index()
+# the SCF has no consumption: drop the all-empty SCF-view consumption columns
+series = series.drop(columns=[c for c in series.columns if series[c].isna().all()])
 series = add_tq(series)
 labels.update({"year": "Year", "quarter": "Quarter (1-4)", "time": "Quarter label (YYYY-Qq)"})
 series.to_stata("data/dd_series.dta", write_index=False, version=118,
@@ -72,15 +74,23 @@ series.to_stata("data/dd_series.dta", write_index=False, version=118,
                 data_label="Distributional Dynamics: reconstructed series"[:80])
 
 # ── dd_master (microdata) ────────────────────────────────────────────────────
-micro = pd.read_csv("data/PSID_synthetic_microdata.csv")
-micro = add_tq(micro)
+def tidy_micro(df):
+    """Integer cell keys; zero (not missing) weight on the nine duplicate copies of each
+    (income, wealth) cell in quarters without consumption (1984-Q2 to 1999-Q1)."""
+    for c in ["grid_point", "consumgrid", "incomegrid", "wealthgrid"]:
+        df[c] = df[c].astype(int)
+    df["cop_share"] = df["cop_share"].fillna(0.0)
+    return add_tq(df)
+
+micro = tidy_micro(pd.read_csv("data/PSID_synthetic_microdata.csv"))
+micro.drop(columns=["year", "quarter"]).to_csv("data/PSID_synthetic_microdata.csv", index=False)
 mlab = {
     "year": "Year", "quarter": "Quarter (1-4)", "time": "Quarter label (YYYY-Qq)",
     "cop_share": "Copula cell probability mass (weight)",
     "grid_point": "Copula grid cell index",
-    "consum": "Consumption, mean among the cell's households (2019 USD per household)",
-    "income": "Income, mean among the cell's households (2019 USD per household)",
-    "wealth": "Wealth, mean among the cell's households (2019 USD per household)",
+    "consum": "Consumption, mean among the cell's households (2019Q4 USD per household)",
+    "income": "Income, mean among the cell's households (2019Q4 USD per household)",
+    "wealth": "Wealth, mean among the cell's households (2019Q4 USD per household)",
     "consumgrid": "Consumption grid coordinate (rank cell)",
     "incomegrid": "Income grid coordinate (rank cell)",
     "wealthgrid": "Wealth grid coordinate (rank cell)",
@@ -94,3 +104,34 @@ print("written:", "dd_series.dta", series.shape, "| dd_master.dta", micro.shape)
 series.to_csv("data/dd_series.csv", index=False)
 micro.to_csv("data/dd_master.csv", index=False)
 print("csv twins written")
+
+# ── implicates: same cleanup, plus year/quarter ─────────────────────────────
+import glob
+for f in sorted(glob.glob("data/implicates/PSID_synthetic_microdata_imp*.csv")):
+    imp = pd.read_csv(f)
+    if "year" not in imp.columns:
+        imp = tidy_micro(imp)
+    imp.to_csv(f, index=False)
+print("implicates cleaned")
+
+# ── balance-sheet items: per-item CSVs → combined dd_items_SCF.{csv,dta} ────
+# stocks: next-40 and top-10 wealth groups only (bottom-50 holdings are below the
+# resolution of the representation)
+ITEMS = ["real_estate", "mortgages", "consumer_credit", "pension", "stocks"]
+parts = []
+for it in ITEMS:
+    d = pd.read_csv(f"data/items/{it}_SCF.csv").rename(columns={"date": "time"})
+    d.to_csv(f"data/items/{it}_SCF.csv", index=False, float_format="%.6g")
+    parts.append(d.assign(item=it))
+items = pd.concat(parts, ignore_index=True)[["time", "item", "grouping", "group", "mean_per_hh", "share"]]
+items.to_csv("data/items/dd_items_SCF.csv", index=False, float_format="%.6g")
+items = add_tq(items)
+items.to_stata("data/items/dd_items_SCF.dta", write_index=False, version=118,
+               variable_labels={"year": "Year", "quarter": "Quarter (1-4)", "time": "Quarter label (YYYY-Qq)",
+                                "item": "Balance-sheet item",
+                                "grouping": "wealth_groups / income_quintiles / own_deciles",
+                                "group": "Group label",
+                                "mean_per_hh": "Mean per household in group (2019Q4 USD, CPI-U)",
+                                "share": "Group share of item total"},
+               data_label="Distributional Dynamics: SCF balance-sheet items by group")
+print("items written:", items.shape, sorted(items.item.unique()))

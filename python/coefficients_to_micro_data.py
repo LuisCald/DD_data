@@ -13,7 +13,7 @@ relative to the per-household mean. `--values decile` gives the earlier layout,
 where each cell carries the unconditional decile average of each measure. Scale to dollar levels with
 data/aggregate_anchors.csv (level = value * <measure>_per_hh).
 (The published data/PSID_synthetic_microdata.csv and dd_master are already
-scaled this way, i.e. in 2019 USD per household.)
+scaled this way, i.e. in 2019Q4 USD (CPI-U) per household.)
 
     python coefficients_to_micro_data.py                        # PSID, all quarters
     python coefficients_to_micro_data.py --dataset PSID --date 2008-Q3
@@ -109,8 +109,26 @@ def cell_means(r: Reconstruction, date: str) -> dict:
     return out
 
 
+def income_wealth_pmf(r: Reconstruction, date: str) -> np.ndarray:
+    """10x10 (income, wealth) cell masses from the copula's consumption-free slice
+    kappa[0, :, :] — used in quarters without the consumption marginal."""
+    k2 = np.nan_to_num(r._kappa(date)[0])
+    Imat = np.stack([I(o, _EDGES[1:]) for o in range(GRID_COP)], axis=0)
+    pad = np.zeros((GRID + 1, GRID + 1))
+    pad[1:, 1:] = np.einsum("bc,bj,ck->jk", k2, Imat, Imat)
+    pmf = pad[1:, 1:] - pad[:-1, 1:] - pad[1:, :-1] + pad[:-1, :-1]
+    pmf[pmf < 0] = 0.0
+    return pmf / pmf.sum()
+
+
 def micro_rows(r: Reconstruction, date: str, digits: int = 6, values: str = "cell") -> pd.DataFrame:
-    pmf = r.copula_pmf_grid(date)                      # 10x10x10, matches ciw_*
+    if np.all(np.isnan(r._xi(date, "consum"))):
+        # no consumption marginal: the (income, wealth) cells sit in the consumgrid == 1
+        # rows; the other nine copies carry weight 0
+        pmf = np.zeros((GRID, GRID, GRID))
+        pmf[0] = income_wealth_pmf(r, date)
+    else:
+        pmf = r.copula_pmf_grid(date)                  # 10x10x10, matches ciw_*
     if values == "cell":
         cm = cell_means(r, date)
         val = lambda m, i, j, k: np.nan if cm[m] is None else round(float(cm[m][i, j, k]), digits)
