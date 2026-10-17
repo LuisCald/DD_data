@@ -46,7 +46,7 @@ for you.
 
 ## Synthetic micro data
 
-`dd_master` / `PSID_synthetic_microdata.csv` follow the replication pipeline's
+`dd_microdata` / `PSID_synthetic_microdata.csv` follow the replication pipeline's
 `construct_micro_dataset` layout: one row per cell of the 10×10×10 decile copula grid.
 The weight `cop_share` is the copula mass of the cell. Each of `consum`, `income` and
 `wealth` is the mean of that variable among the households in the cell,

@@ -12,7 +12,7 @@ HOUSEHOLDS IN THE CELL (copula-weighted, `--values cell`, default since Oct 2026
 relative to the per-household mean. `--values decile` gives the earlier layout,
 where each cell carries the unconditional decile average of each measure. Scale to dollar levels with
 data/aggregate_anchors.csv (level = value * <measure>_per_hh).
-(The published data/PSID_synthetic_microdata.csv and dd_master are already
+(The published data/PSID_synthetic_microdata.csv and dd_microdata are already
 scaled this way, i.e. in 2019Q4 USD (CPI-U) per household.)
 
     python coefficients_to_micro_data.py                        # PSID, all quarters

@@ -13,7 +13,7 @@ with aggregate data. From Bayer, Calderon and Kuhn, *Distributional Dynamics*, C
 |---|---|
 | Group means and shares in a tidy table (bottom 50 / next 40 / top 10, quintiles, deciles; also consumption or wealth by income group) | `data/dd_tidy_long.csv` |
 | Decile-group series in one row per quarter | `data/dd_series.{csv,dta}` |
-| Household-level (cell) data to merge or compute my own statistics | `data/dd_master.{csv,dta}` |
+| Household-level (cell) data to merge or compute my own statistics | `data/dd_microdata.{csv,dta}` |
 | Uncertainty for statistics computed from the micro data | `data/implicates/` (5 files) |
 | Balance sheets by DFA wealth group: real estate, mortgages, consumer credit, pensions, stocks | `data/items/dd_items_SCF.{csv,dta}` |
 | Posterior bands on any moment, or the model objects | factor draws, coefficients ([Advanced](#advanced-files)) |
@@ -34,12 +34,12 @@ top10.plot(x="time", y="share", title="Top-10% wealth share (SCF view)")
 u <- "https://www.distributionaldynamics.com/data/"
 t <- read.csv(paste0(u, "dd_tidy_long.csv"))
 c_by_inc <- subset(t, survey == "psid" & variable == "consum" & ranked_by == "income" & grouping == "quintiles")
-mic <- read.csv(paste0(u, "dd_master.csv"))
+mic <- read.csv(paste0(u, "dd_microdata.csv"))
 with(subset(mic, time == "2019-Q4"), weighted.mean(income, cop_share))
 ```
 
 ```stata
-use "https://www.distributionaldynamics.com/data/dd_master.dta", clear
+use "https://www.distributionaldynamics.com/data/dd_microdata.dta", clear
 collapse (mean) income wealth [aw=cop_share], by(year quarter)
 use "https://www.distributionaldynamics.com/data/items/dd_items_SCF.dta", clear
 ```
@@ -62,7 +62,7 @@ use "https://www.distributionaldynamics.com/data/items/dd_items_SCF.dta", clear
 
 ## Synthetic micro data and implicates
 
-`dd_master` has one row per cell of the 10×10×10 grid of consumption, income and wealth
+`dd_microdata` has one row per cell of the 10×10×10 grid of consumption, income and wealth
 deciles, 1,000 rows per quarter, 1984-Q2 to 2024-Q1. `consum/income/wealth` are means among
 the cell's households; `cop_share` is the cell's population weight and sums to 1 each quarter.
 Always use the weight. There is no household ID: to merge, rank your own households into
@@ -102,7 +102,7 @@ published for `next40` and `top10` only. Private business is not published. See
 | `{PSID,SCF,CEX,CPS,CPS2,SIPP1,SIPP2,SIPP3}_coefficients_{normal,average}.csv` | Legendre coefficients, 1,730 per quarter, for each survey view. `_normal` includes the HP trend (use in sample); `_average` uses the time-averaged trend (use for counterfactuals and with `FactorMap`). Blocks a survey does not measure are empty: the CPS views have income only (CPS2 = income years 1967–1992, CPS = 1993 on); the SIPP views income and wealth (SIPP1 = panels 1984–1993, SIPP2 = panels 1996–2008, SIPP3 = the 2014 panel and later releases); only the PSID has the 3D copula. |
 | `{PSID,SCF}_functional_data{,_detrended}.csv` | The coefficients evaluated: copula cell masses `ciw_ijk` and decile profiles. |
 | `aggregate_anchors.csv` | Per-household consumption, income and wealth and the number of households (`tot_hhs`), 1962–2024. Dates are quarter starts (`1962-07-01` = 1962-Q3). |
-| `PSID_synthetic_microdata.csv` | `dd_master` without `year`/`quarter` (the layout the scripts write). |
+| `PSID_synthetic_microdata.csv` | `dd_microdata` without `year`/`quarter` (the layout the scripts write). |
 
 **Scripts** (`python/`, `julia/`; same API in both): `reconstruct` (core library),
 `factors_to_coefficients`, `coefficients_to_moments`, `coefficients_to_micro_data`,

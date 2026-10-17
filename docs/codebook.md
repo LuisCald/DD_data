@@ -27,7 +27,7 @@ Dollar values are 2019Q4 USD (CPI-U) per household unless noted. `time` is `YYYY
 
 `var` is `consum`, `income` or `wealth`; `survey` is `psid` or `scf` (no SCF consumption).
 
-## dd_master.{csv,dta}, implicates/PSID_synthetic_microdata_imp{1..5}.csv
+## dd_microdata.{csv,dta}, implicates/PSID_synthetic_microdata_imp{1..5}.csv
 
 | Variable | Type | Description |
 |---|---|---|

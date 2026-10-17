@@ -1,6 +1,6 @@
 """Generate Stata (.dta, v118) twins of the published data products.
 
-  data/dd_master.dta  — synthetic microdata (the master file)
+  data/dd_microdata.dta  — synthetic microdata (the master file)
   data/dd_series.dta  — quantiles/levels/shares (PSID & SCF views, normal +
                         detrended) + smoothed factors, one row per quarter
 
@@ -73,7 +73,7 @@ series.to_stata("data/dd_series.dta", write_index=False, version=118,
                 variable_labels={k: v[:80] for k, v in labels.items() if k in series.columns},
                 data_label="Distributional Dynamics: reconstructed series"[:80])
 
-# ── dd_master (microdata) ────────────────────────────────────────────────────
+# ── dd_microdata (microdata) ────────────────────────────────────────────────────
 def tidy_micro(df):
     """Integer cell keys; zero (not missing) weight on the nine duplicate copies of each
     (income, wealth) cell in quarters without consumption (1984-Q2 to 1999-Q1); consumption
@@ -97,14 +97,14 @@ mlab = {
     "incomegrid": "Income grid coordinate (rank cell)",
     "wealthgrid": "Wealth grid coordinate (rank cell)",
 }
-micro.to_stata("data/dd_master.dta", write_index=False, version=118,
+micro.to_stata("data/dd_microdata.dta", write_index=False, version=118,
                variable_labels={k: v[:80] for k, v in mlab.items() if k in micro.columns},
                data_label="Distributional Dynamics: synthetic microdata"[:80])
-print("written:", "dd_series.dta", series.shape, "| dd_master.dta", micro.shape)
+print("written:", "dd_series.dta", series.shape, "| dd_microdata.dta", micro.shape)
 
 # ── CSV twins (same harmonized names; URL-readable from Julia/Python/R) ──────
 series.to_csv("data/dd_series.csv", index=False)
-micro.to_csv("data/dd_master.csv", index=False)
+micro.to_csv("data/dd_microdata.csv", index=False)
 print("csv twins written")
 
 # ── implicates: same cleanup, plus year/quarter ─────────────────────────────

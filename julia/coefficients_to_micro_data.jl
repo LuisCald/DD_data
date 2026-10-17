@@ -50,7 +50,7 @@
 #
 #   level_it = value_it × <measure>_per_hh_t
 #
-# (The published data/PSID_synthetic_microdata.csv and dd_master are already
+# (The published data/PSID_synthetic_microdata.csv and dd_microdata are already
 # scaled this way, i.e. in 2019Q4 USD (CPI-U) per household.)
 #
 # To expand into unit-record data (N synthetic households), sample rows with
