@@ -2,6 +2,10 @@
 
 ## 2026-10 (October 2026 vintage)
 
+- CPS survey views (income only) in `dd_series` and `dd_tidy_long`: `cps` (1993-Q4 on) and `cps1967`
+  (1967-Q4 to 1993-Q3), built from the published CPS and CPS2 coefficients by `tools_make_cps_views.py`.
+  Existing PSID and SCF rows are unchanged.
+
 - Estimates from the paper's replication specification: 8 distributional and 11 aggregate factors.
 - Synthetic micro data carry the means among each cell's households; five implicates from joint posterior draws.
 - New `dd_tidy_long.csv`: group means and shares, including groups across variables (maximum entropy).

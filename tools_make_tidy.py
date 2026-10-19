@@ -3,7 +3,8 @@
 One row per (quarter, survey view, variable, ranking variable, grouping, group):
 
   time, year, quarter   quarter (YYYY-Qq) and its parts
-  survey                psid | scf (the model's PSID or SCF view)
+  survey                psid | scf | cps | cps1967 (the model's PSID, SCF or CPS view; the CPS
+                        views are income only: cps = 1993 on, cps1967 = 1967-1993)
   variable              consum | income | wealth (the outcome)
   ranked_by             the variable households are ranked by. Equal to `variable` for
                         the usual own-ranked groups (e.g. the wealth share of the top 10% of
@@ -44,7 +45,7 @@ CROSS_RUNS = {"wealth_groups": ("50,40,10", [0.5, 0.4, 0.1]), "quintiles": ("20,
 
 def own_ranked(series):
     rows = []
-    for survey in ["psid", "scf"]:
+    for survey in ["psid", "scf", "cps", "cps1967"]:
         for var in ["consum", "income", "wealth"]:
             mcol = {d: f"{var}_quantile_{d}_{survey}" for d in DECILES}
             scol = {d: f"{var}_share_{d}_{survey}" for d in DECILES}

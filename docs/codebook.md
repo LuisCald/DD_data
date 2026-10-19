@@ -7,7 +7,7 @@ Dollar values are 2019Q4 USD (CPI-U) per household unless noted. `time` is `YYYY
 | Variable | Type | Description |
 |---|---|---|
 | `time`, `year`, `quarter` | str, int, int | Quarter |
-| `survey` | str | `psid` or `scf` (survey view) |
+| `survey` | str | `psid`, `scf`, `cps` (income, 1993-Q4 on) or `cps1967` (income, 1967-Q4 to 1993-Q3): survey view |
 | `variable` | str | Outcome: `consum`, `income`, `wealth` |
 | `ranked_by` | str | Variable households are ranked by (equal to `variable` for own-ranked groups) |
 | `grouping` | str | `deciles`, `quintiles`, `wealth_groups` |
@@ -25,7 +25,8 @@ Dollar values are 2019Q4 USD (CPI-U) per household unless noted. `time` is `YYYY
 | `<var>_share_<g>_<survey>[_dt]` | float | Group share of the total; the ten shares sum to 1 |
 | `factor_1`…`factor_43` | float | Smoothed states (= `x1`…`x43` in `smoothed_factors.csv`) |
 
-`var` is `consum`, `income` or `wealth`; `survey` is `psid` or `scf` (no SCF consumption).
+`var` is `consum`, `income` or `wealth`; `survey` is `psid`, `scf` (no SCF consumption), `cps` or `cps1967` (income only).
+The CPS views have no detrended (`_dt`) columns.
 
 ## dd_microdata.{csv,dta}, implicates/PSID_synthetic_microdata_imp{1..5}.csv
 
@@ -57,5 +58,5 @@ Dollar values are 2019Q4 USD (CPI-U) per household unless noted. `time` is `YYYY
 | `smoothed_factor_draws.csv` | `draw` (1–200), `time`, `x1`…`x43` |
 | `smoothed_factors_bands.csv` | `time`, `xK_p05`, `xK_p50`, `xK_p95` |
 | `{PSID,SCF,CEX,CPS,CPS2,SIPP1,SIPP2,SIPP3}_coefficients_{normal,average}.csv` | `time`, `x1`…`x1730`: 3 × 12 marginal coefficients (asinh scale), then 12³ − 34 copula coefficients |
-| `{PSID,SCF}_functional_data{,_detrended}.csv` | `time`; `ciw_ijk` copula cell masses; `{quantiles,levels,shares}<var>_<u>` decile profiles relative to the per-household mean (`u` = upper edge, `0.999999` = top) |
+| `{PSID,SCF}_functional_data{,_detrended}.csv`, `{CPS,CPS1967}_functional_data.csv` | `time`; `ciw_ijk` copula cell masses (PSID and SCF only); `{quantiles,levels,shares}<var>_<u>` for the decile group with upper edge `u` (`0.999999` = top 10%): mean per household (USD), group total (USD) and share of the total |
 | `aggregate_anchors.csv` | `time` (quarter start date), `consum_per_hh`, `income_per_hh`, `wealth_per_hh`, `tot_hhs` (number of households) |

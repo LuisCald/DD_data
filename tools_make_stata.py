@@ -2,7 +2,7 @@
 
   data/dd_microdata.dta  — synthetic microdata (the master file)
   data/dd_series.dta  — quantiles/levels/shares (PSID & SCF views, normal +
-                        detrended) + smoothed factors, one row per quarter
+                        detrended; CPS views, income) + smoothed factors, one row per quarter
 
 Coefficient files stay CSV-only (pipeline users). Factor DRAWS deliberately
 excluded — dataset notes point to them for proper uncertainty treatment.
@@ -39,7 +39,10 @@ labels = {}
 for view, vtag, vlab in [("PSID_functional_data", "psid", "PSID view"),
                          ("PSID_functional_data_detrended", "psid_dt", "PSID view, detrended"),
                          ("SCF_functional_data", "scf", "SCF view"),
-                         ("SCF_functional_data_detrended", "scf_dt", "SCF view, detrended")]:
+                         ("SCF_functional_data_detrended", "scf_dt", "SCF view, detrended"),
+                         # CPS views, income only (tools_make_cps_views.py)
+                         ("CPS_functional_data", "cps", "CPS view, 1993 on"),
+                         ("CPS1967_functional_data", "cps1967", "CPS view, 1967-1993")]:
     df = pd.read_csv(f"data/{view}.csv")
     keep = ["time"] + [c for c in df.columns if not c.startswith("ciw_") and c != "time"]
     df = df[keep]

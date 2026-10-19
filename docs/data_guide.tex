@@ -66,11 +66,14 @@ Bayer, C., L.\ Calderon and M.\ Kuhn, ``Distributional Dynamics'', CEPR Discussi
         example, captures the very rich much better. The model therefore reports the estimated
         distribution \emph{as each survey would measure it}: one view per survey file (CEX, CPS, CPS2,
         PSID, SCF, SIPP1--3). All eight are published as coefficients (product 7). The ready-made
-        statistics and micro data are for the two views that matter most:
+        statistics and micro data are for the PSID and SCF views; income also comes in two CPS views:
         \begin{itemize}
           \item \textbf{PSID view} (\file{psid}): the only survey that measures consumption, income and
                 wealth together. Income from 1968, wealth from 1984-Q2, consumption from 1999-Q2.
           \item \textbf{SCF view} (\file{scf}): income and wealth, 1962-Q3 to 2024-Q1. Best for the top tail.
+          \item \textbf{CPS views}, income only: \file{cps1967} (1967-Q4 to 1993-Q3) and \file{cps}
+                (from 1993-Q4). They are separate because the CPS changed how it measures income in 1993;
+                the top-10\% income share is about 2 points higher under the new measurement.
         \end{itemize}
         The SCF view has higher top shares than the PSID view; neither is ``wrong''.
   \item \textbf{Groups.} Households are ranked within each quarter. Deciles (\file{d1}--\file{d10}),
@@ -87,7 +90,7 @@ Bayer, C., L.\ Calderon and M.\ Kuhn, ``Distributional Dynamics'', CEPR Discussi
 \facts{
 What & Mean per household and share of the total, for consumption, income and wealth, by decile,
        quintile and bottom 50 / next 40 / top 10. \\
-Coverage & 1962-Q3 to 2024-Q1 (SCF view); PSID view as in Section 2. \\
+Coverage & 1962-Q3 to 2024-Q1 (SCF view); PSID and CPS views as in Section 2. \\
 Files & \file{dd\_tidy\_long.csv}: one row per quarter, survey view, variable and group (easiest to use).\newline
         \file{dd\_series.csv / .dta}: one row per quarter, with decile columns (means, totals, shares),
         also detrended (\file{\_dt}). \\
@@ -228,7 +231,7 @@ every file.
   \item These are \textbf{model-based estimates}, not survey tabulations. Between survey waves, and
         especially before 1989 when there are few SCF waves, the series are interpolations by the model.
         They step when a new survey wave enters.
-  \item The \textbf{two survey views differ} by design (Section 2). Compare like with like.
+  \item The \textbf{survey views differ} by design (Section 2). Compare like with like.
   \item \textbf{Stocks} are published for the next 40\% and top 10\% of wealth only.
         \textbf{Pensions} start in 1983.
   \item \textbf{Survey definitions} differ somewhat across surveys (for example, which assets count as

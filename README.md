@@ -53,7 +53,11 @@ use "https://www.distributionaldynamics.com/data/items/dd_items_SCF.dta", clear
 - **Timing:** quarterly, `time` = `YYYY-Qq`. PSID series start when the PSID measures do:
   income 1968, wealth 1984 (1984-Q2), consumption 1999. The SCF view has income and wealth only.
 - **Survey views:** `psid` and `scf` are the model's distribution in each survey's measurement
-  (the SCF captures the top tail better, so its top shares are higher).
+  (the SCF captures the top tail better, so its top shares are higher). The CPS views are income
+  only: `cps` (1993-Q4 on) and `cps1967` (1967-Q4 to 1993-Q3). They are separate because the CPS
+  changed how it measures income in 1993 (new interview method, higher top codes); the top-10%
+  income share is about 2 points higher under the new measurement, so do not splice them without
+  accounting for that break.
 - **Groups:** households are ranked by `ranked_by` within the quarter. `bottom50/next40/top10`
   are the Fed DFA wealth groups; `0-20 … 80-100` quintiles; `d1 … d10` deciles. In
   `dd_series`, decile groups are named `p10 … p90, top` (`p10` = 0–10th percentile).
