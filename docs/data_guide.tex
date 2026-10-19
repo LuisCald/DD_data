@@ -176,7 +176,19 @@ Use it for & A percentile, a Gini coefficient, groups of your own choosing, or a
 }
 \end{product}
 
-\begin{product}{8. Aggregate anchors}
+\begin{product}{8. Other joint distributions (products)}
+\facts{
+What & Four more joint distributions, each estimated separately with three measures: consumption with
+       gross liquid assets and consumer debt; with total assets and total debt; with gross liquid assets and
+       mortgage debt; with income and mortgage debt. Group means and shares (own-ranked and cross groups),
+       the quarterly share of households with no debt, and coefficients. SCF and PSID views. \\
+Coverage & 1962-Q3 to 2024-Q1 (SCF view); PSID view as in Section 2. \\
+Files & \file{products/<product>/<product>\_tidy\_long.csv}, \file{<product>\_share\_zero.csv}, coefficients. \\
+Use it for & Debt and liquidity across the consumption distribution; who has no mortgage or no debt, quarter by quarter. \\
+}
+\end{product}
+
+\begin{product}{9. Aggregate anchors}
 \facts{
 What & Consumption, income and wealth per household from the national accounts, and the number of
        households. They set the dollar levels of all outputs. \\
@@ -184,7 +196,7 @@ Files & \file{aggregate\_anchors.csv}. \\
 }
 \end{product}
 
-\begin{product}{9. Inputs and replication}
+\begin{product}{10. Inputs and replication}
 \facts{
 What & The cleaned survey files the model reads (CPS, PSID, CEX, SCF, SIPP), the estimation code and the
        estimated parameters. Reproducing the baseline results takes under 30 minutes; re-estimating the

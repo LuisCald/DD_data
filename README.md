@@ -16,6 +16,7 @@ with aggregate data. From Bayer, Calderon and Kuhn, *Distributional Dynamics*, C
 | Household-level (cell) data to merge or compute my own statistics | `data/dd_microdata.{csv,dta}` |
 | Uncertainty for statistics computed from the micro data | `data/implicates/` (5 files) |
 | Balance sheets by DFA wealth group: real estate, mortgages, consumer credit, pensions, stocks | `data/items/dd_items_SCF.{csv,dta}` |
+| Other joint distributions: consumption with liquid assets, total assets, debt or mortgages | `data/products/<product>/` ([Products](#other-joint-distributions-products)) |
 | Posterior bands on any moment, or the model objects | factor draws, coefficients ([Advanced](#advanced-files)) |
 
 Column definitions for every file: [`docs/codebook.md`](docs/codebook.md).
@@ -89,6 +90,35 @@ print(est.mean(), np.sqrt(1.2 * est.var()))   # estimate, standard error
 ```
 
 Five draws give rough bands; for precise bands use the 200 factor draws (`posterior_bands`).
+
+## Other joint distributions (products)
+
+Four more joint distributions, each a separate estimation of the model with three measures (same
+specification as the main data), quarterly 1962-Q3 to 2024-Q1 in the SCF and PSID views:
+
+| Product | Measures |
+|---|---|
+| `consum_grossliq_debt` | consumption, gross liquid assets (deposits, CDs, savings bonds, stocks and mutual funds), consumer (non-housing) debt |
+| `consum_totassets_totdebt` | consumption, total assets (without pensions), total debt (mortgages + other real-estate debt + consumer debt) |
+| `consum_grossliq_mortdebt` | consumption, gross liquid assets, mortgage debt on the primary residence |
+| `consum_income_mortdebt` | consumption, income, mortgage debt |
+
+Each folder has `<product>_tidy_long.csv` (same columns as `dd_tidy_long.csv`: own-ranked deciles,
+quintiles and bottom 50 / next 40 / top 10, and each measure by quintiles and bottom 50 / next 40 /
+top 10 of the other two), `<product>_share_zero.csv` (the quarterly share of households with no debt
+of that kind, estimated by the model), and the PSID and SCF coefficients with `coefficients_meta.csv`.
+
+- Debt has a point mass at zero (households without debt); the model carries the share of zeros in its
+  state. In the coefficient files, the debt block's last column is the logit of that share, not a Legendre
+  coefficient (see `coefficients_meta.csv`); the Python/Julia scripts in this repository assume consumption,
+  income and wealth and do not read these files yet.
+- Gross liquid assets and total assets are cut at zero in the reconstruction (they cannot be negative).
+  Small negative bottom-group means (a few hundred dollars, inside the zero mass) are set to 0.
+- The SCF view of total debt by the bottom total-assets quintile is left out in 51 quarters (1962–72,
+  2021–24), where the cross-tabulation fails (negative mean).
+- Anchors (Z.1): gross liquid = deposits + Treasury securities + equities/mutual funds; total assets =
+  net worth + mortgages + consumer credit; total debt = mortgages + consumer credit; mortgage debt = home
+  mortgages; consumer debt = consumer credit.
 
 ## Balance-sheet items
 

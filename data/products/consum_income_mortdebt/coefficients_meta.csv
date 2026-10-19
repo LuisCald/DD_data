@@ -1,0 +1,9 @@
+key,value
+measures (block order),"consum,income,mortdebt"
+copula columns,x1-x1694
+consum marginal columns,x1695-x1706
+income marginal columns,x1707-x1718
+mortdebt marginal columns,x1719-x1730
+atom measure,mortdebt
+participation_in_state,true
+logit share of zeros column,x1730

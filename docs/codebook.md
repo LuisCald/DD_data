@@ -50,6 +50,14 @@ The CPS views have no detrended (`_dt`) columns.
 | `mean_per_hh` | float | Group mean holding per household |
 | `share` | float | Group share of the item total |
 
+## products/<product>/
+
+| File | Variables |
+|---|---|
+| `<product>_tidy_long.csv` | as `dd_tidy_long.csv`; `variable`/`ranked_by` are the product's measures (`consum`, `income`, `grossliq`, `totassets`, `debt`, `totdebt`, `mortdebt`); `survey` is `psid` or `scf` |
+| `<product>_share_zero.csv` | `time`, `survey`, `variable` (the debt measure), `share_zero` (share of households with zero) |
+| `{PSID,SCF}_coefficients_{normal,average}.csv` | as the main coefficient files; block order and the debt block's logit share-of-zeros column in `coefficients_meta.csv` |
+
 ## Model files
 
 | File | Variables |
