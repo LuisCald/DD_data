@@ -62,13 +62,15 @@ Bayer, C., L.\ Calderon and M.\ Kuhn, ``Distributional Dynamics'', CEPR Discussi
   \item \textbf{Dollars:} 2019Q4 U.S.\ dollars (deflated with the CPI-U). Totals are anchored to the
         national accounts, so the means per household match the national-accounts per-household values.
   \item \textbf{Time:} quarterly, written \file{YYYY-Qq} (for example \file{2019-Q4}).
-  \item \textbf{Two survey views.} Surveys measure the same households differently; the SCF, for
-        example, captures the very rich much better. We therefore report the estimated distribution
-        \emph{as each survey would measure it}:
+  \item \textbf{Survey views.} Surveys measure the same households differently; the SCF, for
+        example, captures the very rich much better. The model therefore reports the estimated
+        distribution \emph{as each survey would measure it}: one view per survey file (CEX, CPS, CPS2,
+        PSID, SCF, SIPP1--3). All eight are published as coefficients (product 7). The ready-made
+        statistics and micro data are for the two views that matter most:
         \begin{itemize}
+          \item \textbf{PSID view} (\file{psid}): the only survey that measures consumption, income and
+                wealth together. Income from 1968, wealth from 1984-Q2, consumption from 1999-Q2.
           \item \textbf{SCF view} (\file{scf}): income and wealth, 1962-Q3 to 2024-Q1. Best for the top tail.
-          \item \textbf{PSID view} (\file{psid}): income from 1968, wealth from 1984-Q2, consumption from
-                1999-Q2. The only view with consumption.
         \end{itemize}
         The SCF view has higher top shares than the PSID view; neither is ``wrong''.
   \item \textbf{Groups.} Households are ranked within each quarter. Deciles (\file{d1}--\file{d10}),
