@@ -1,0 +1,243 @@
+% Distributional Dynamics: data guide in plain English (October 2026 vintage).
+% Build: latexmk -pdf data_guide.tex  ->  DD_data_guide.pdf (renamed), copied to the website's pdfs/.
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{microtype}
+\usepackage{booktabs,tabularx,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{upquote}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{accent}{HTML}{1E3A5F}
+\definecolor{codebg}{HTML}{F0ECE4}
+\hypersetup{colorlinks=true,linkcolor=accent,urlcolor=accent}
+\titleformat{\section}{\Large\bfseries\color{accent}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.6em}{}
+\setlist{itemsep=2pt,topsep=4pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\lstset{basicstyle=\ttfamily\small,backgroundcolor=\color{codebg},frame=none,
+        breaklines=true,columns=fullflexible,keepspaces=true,xleftmargin=6pt,xrightmargin=6pt,
+        aboveskip=4pt,belowskip=4pt}
+\newcommand{\file}[1]{\texttt{#1}}
+
+% one box per product
+\newenvironment{product}[1]{\subsection*{#1}}{}
+\newcommand{\facts}[1]{\begin{tabularx}{\linewidth}{@{}>{\bfseries}p{2.6cm}>{\raggedright\arraybackslash}X@{}}#1\end{tabularx}\par\vspace{3pt}}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries\color{accent} Distributional Dynamics}\\[4pt]
+{\Large Data guide: what we provide, in plain English}\\[10pt]
+Christian Bayer \quad Luis Calderon \quad Moritz Kuhn\\[2pt]
+October 2026 vintage \quad\textbullet\quad \href{https://www.distributionaldynamics.com}{distributionaldynamics.com}
+\end{center}
+
+\section{What this is}
+
+Household surveys measure consumption, income and wealth, but no single survey measures all three,
+every quarter, over decades. Wealth is surveyed every three years (SCF), consumption in another survey
+(CEX), income in several others (CPS, SIPP, PSID). Our method combines these five surveys with national
+accounts and estimates the \textbf{joint distribution of consumption, income and wealth of U.S.\
+households, every quarter from 1962 to 2024}. ``Joint'' means we know not only how unequal each
+variable is, but also how they line up: for example, how much the income-rich consume, or how much
+wealth the consumption-poor hold.
+
+Everything described here is free to use under CC BY 4.0. Please cite:
+Bayer, C., L.\ Calderon and M.\ Kuhn, ``Distributional Dynamics'', CEPR Discussion Paper 19829.
+
+\section{Basics you need for every file}
+
+\begin{itemize}
+  \item \textbf{Unit:} the household. Consumption and income are annual amounts per household
+        (measured every quarter); wealth is net worth (assets minus debts). Income is before taxes and
+        includes transfers.
+  \item \textbf{Dollars:} 2019Q4 U.S.\ dollars (deflated with the CPI-U). Totals are anchored to the
+        national accounts, so the means per household match the national-accounts per-household values.
+  \item \textbf{Time:} quarterly, written \file{YYYY-Qq} (for example \file{2019-Q4}).
+  \item \textbf{Two survey views.} Surveys measure the same households differently; the SCF, for
+        example, captures the very rich much better. We therefore report the estimated distribution
+        \emph{as each survey would measure it}:
+        \begin{itemize}
+          \item \textbf{SCF view} (\file{scf}): income and wealth, 1962-Q3 to 2024-Q1. Best for the top tail.
+          \item \textbf{PSID view} (\file{psid}): income from 1968, wealth from 1984-Q2, consumption from
+                1999-Q2. The only view with consumption.
+        \end{itemize}
+        The SCF view has higher top shares than the PSID view; neither is ``wrong''.
+  \item \textbf{Groups.} Households are ranked within each quarter. Deciles (\file{d1}--\file{d10}),
+        quintiles (\file{0-20} \dots\ \file{80-100}) and the wealth groups the Federal Reserve uses
+        (\file{bottom50}, \file{next40}, \file{top10}).
+  \item \textbf{Between survey waves} the estimates are model-based: the model uses all surveys and the
+        aggregate data to fill in the quarters a survey does not cover.
+\end{itemize}
+
+\clearpage
+\section{The products}
+
+\begin{product}{1. Group statistics: inequality over time}
+\facts{
+What & Mean per household and share of the total, for consumption, income and wealth, by decile,
+       quintile and bottom 50 / next 40 / top 10. \\
+Coverage & 1962-Q3 to 2024-Q1 (SCF view); PSID view as in Section 2. \\
+Files & \file{dd\_tidy\_long.csv}: one row per quarter, survey view, variable and group (easiest to use).\newline
+        \file{dd\_series.csv / .dta}: one row per quarter, with decile columns (means, totals, shares),
+        also detrended (\file{\_dt}). \\
+Use it for & The top-10\% wealth share since 1962; how the bottom half's consumption moved in the
+             Great Recession. \\
+}
+\end{product}
+
+\begin{product}{2. Cross-tabulations: one variable by another's groups}
+\facts{
+What & Each variable within groups ranked by another variable: consumption by income quintile, wealth
+       of the top 10\% by income, income by wealth group, and so on. \\
+Coverage & PSID view: all directions, quintiles and bottom 50 / next 40 / top 10. SCF view: income by
+           wealth group and wealth by income group. \\
+Files & \file{dd\_tidy\_long.csv}, rows where \file{ranked\_by} differs from \file{variable}. \\
+Use it for & The consumption gap between the top and bottom income quintile over time. \\
+}
+They come from the estimated joint distribution, so they are consistent with the totals every quarter.
+\end{product}
+
+\begin{product}{3. Synthetic micro data: compute your own statistics}
+\facts{
+What & A household-level stand-in for the PSID view. Each quarter, households are grouped into 1,000 cells
+       by their consumption, income and wealth decile. Each cell has a population weight
+       (\file{cop\_share}, summing to 1 per quarter) and its mean consumption, income and wealth. \\
+Coverage & 1984-Q2 to 2024-Q1; consumption from 1999-Q2 (before that, only the income-by-wealth cells
+           have weight). \\
+Files & \file{dd\_microdata.csv / .dta}. \\
+Use it for & Any weighted statistic or your own grouping. To merge with your data, rank your households
+             into deciles and join on the quarter and the three deciles. \\
+}
+Always use the weight. There is no household identifier: the cells are population groups, not people.
+\end{product}
+
+\begin{product}{4. Uncertainty: standard errors for anything you compute}
+\facts{
+What & \textbf{Implicates:} the micro data repeated at five draws from the model's posterior.
+       \textbf{Factor draws:} 200 posterior draws of the factors (below) and 5/50/95\% bands. \\
+Files & \file{implicates/PSID\_synthetic\_microdata\_imp1--5.csv};
+        \file{smoothed\_factor\_draws.csv}, \file{smoothed\_factors\_bands.csv}. \\
+Use it for & Compute your statistic on each implicate. The estimate is the average; the standard error is
+             the square root of $1.2\times$ the variance across the five (as with the SCF implicates).
+             For precise bands, use the 200 factor draws with our scripts. \\
+}
+\end{product}
+
+\begin{product}{5. Factors: the quarterly drivers of the distribution}
+\facts{
+What & Eight latent distributional factors (\file{x1}--\file{x8}) that move the whole joint distribution,
+       with their lags (\file{x9}--\file{x32}) and 11 aggregate factors (\file{x33}--\file{x43}).
+       The factors have no economic labels. \\
+Coverage & 1962-Q3 to 2024-Q1: posterior mode, 200 draws, 5/50/95\% bands. \\
+Files & \file{smoothed\_factors.csv}, \file{smoothed\_factor\_draws.csv},
+        \file{smoothed\_factors\_bands.csv}. \\
+Use it for & Feed a factor path (ours, or a counterfactual you construct) to our scripts to get the
+             distribution it implies; use the factors in your own time-series work. \\
+}
+\end{product}
+
+\begin{product}{6. Household balance sheets}
+\facts{
+What & Real estate, mortgages, consumer credit, pensions and stocks: mean per household and share of the
+       total, by wealth group (as in the Fed's Distributional Financial Accounts), income quintile and
+       own decile. SCF view. \\
+Coverage & 1962-Q3 to 2024-Q1; pensions from 1983-Q3. Stocks are published for the next 40\% and top
+           10\% of wealth only. \\
+Files & \file{items/dd\_items\_SCF.csv / .dta} (all items); \file{items/<item>\_SCF.csv} (one each). \\
+Use it for & Who holds the mortgage debt; how housing wealth is spread across wealth groups. \\
+}
+Each item is estimated jointly with income and wealth. Households without the item are modelled
+explicitly, as a group with zero holdings.
+\end{product}
+
+\begin{product}{7. Coefficients and scripts: any other statistic}
+\facts{
+What & Each quarter's distribution, stored as polynomial coefficients, one file per survey view (CEX, CPS,
+       CPS2, PSID, SCF, SIPP1--3). Short Python and Julia scripts turn them into shares, means,
+       quantiles, group means across variables, micro data, or posterior bands. \\
+Files & \file{<survey>\_coefficients\_normal.csv} (in sample) and \file{\_average.csv} (time-averaged
+        trend, for counterfactuals); scripts in the \file{python/} and \file{julia/} folders. \\
+Use it for & A percentile, a Gini coefficient, groups of your own choosing, or a counterfactual
+             distribution. \\
+}
+\end{product}
+
+\begin{product}{8. Aggregate anchors}
+\facts{
+What & Consumption, income and wealth per household from the national accounts, and the number of
+       households. They set the dollar levels of all outputs. \\
+Files & \file{aggregate\_anchors.csv}. \\
+}
+\end{product}
+
+\begin{product}{9. Inputs and replication}
+\facts{
+What & The cleaned survey files the model reads (CPS, PSID, CEX, SCF, SIPP), the estimation code and the
+       estimated parameters. Reproducing the baseline results takes under 30 minutes; re-estimating the
+       baseline model takes up to 24 hours. \\
+Where & The \href{https://github.com/LuisCald/DD_replication}{DD\_replication} repository on GitHub.
+        The survey files are derived from the original surveys, whose providers' terms apply. \\
+}
+\end{product}
+
+\section{Loading the data}
+
+All files are at \url{https://www.distributionaldynamics.com/data/} and in the
+\href{https://github.com/LuisCald/DD_data}{DD\_data} repository.
+
+\textbf{Python}
+\begin{lstlisting}
+import pandas as pd
+t = pd.read_csv("https://www.distributionaldynamics.com/data/dd_tidy_long.csv")
+t.query("survey == 'scf' and variable == 'wealth' and ranked_by == 'wealth' and group == 'top10'")
+\end{lstlisting}
+
+\textbf{Stata}
+\begin{lstlisting}
+use "https://www.distributionaldynamics.com/data/dd_series.dta", clear
+\end{lstlisting}
+
+\textbf{R}
+\begin{lstlisting}
+t <- read.csv("https://www.distributionaldynamics.com/data/dd_tidy_long.csv")
+\end{lstlisting}
+
+\textbf{Julia}
+\begin{lstlisting}
+using CSV, DataFrames, Downloads
+t = CSV.read(Downloads.download("https://www.distributionaldynamics.com/data/dd_tidy_long.csv"), DataFrame)
+\end{lstlisting}
+
+The \href{https://github.com/LuisCald/DD_data/blob/main/docs/codebook.md}{codebook} lists every column of
+every file.
+
+\section{Caveats}
+
+\begin{itemize}
+  \item These are \textbf{model-based estimates}, not survey tabulations. Between survey waves, and
+        especially before 1989 when there are few SCF waves, the series are interpolations by the model.
+        They step when a new survey wave enters.
+  \item The \textbf{two survey views differ} by design (Section 2). Compare like with like.
+  \item \textbf{Stocks} are published for the next 40\% and top 10\% of wealth only.
+        \textbf{Pensions} start in 1983.
+  \item \textbf{Survey definitions} differ somewhat across surveys (for example, which assets count as
+        wealth); details are in the paper and the replication package.
+\end{itemize}
+
+\section{License, citation, contact}
+
+Data and documentation: CC BY 4.0 (free to use with attribution). Code: MIT.\\
+Cite: Bayer, C., L.\ Calderon and M.\ Kuhn, ``Distributional Dynamics'', CEPR Discussion Paper 19829.\\
+Questions or requests: \href{https://github.com/LuisCald/DD_data/issues}{GitHub issues} or
+\href{mailto:luis.calderon@uni-bonn.de}{luis.calderon@uni-bonn.de}.
+
+\end{document}

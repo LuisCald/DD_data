@@ -19,6 +19,7 @@ with aggregate data. From Bayer, Calderon and Kuhn, *Distributional Dynamics*, C
 | Posterior bands on any moment, or the model objects | factor draws, coefficients ([Advanced](#advanced-files)) |
 
 Column definitions for every file: [`docs/codebook.md`](docs/codebook.md).
+Everything in plain English: the [data guide (PDF)](docs/DD_data_guide.pdf).
 
 ## Quickstart
 
