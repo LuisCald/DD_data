@@ -11,7 +11,10 @@
   including early ones, from the re-estimation itself.
 - New `data/products/`: four further joint distributions (consumption with gross liquid assets, total assets,
   consumer, total and mortgage debt), built by `tools_make_products.py`.
-- The balance-sheet items are unchanged (estimated on the earlier SCF 2022 wave).
+- Balance-sheet items re-estimated on the corrected SCF 2022 wave (2026-10-20). Through 2019 they match the
+  earlier files; the changes come after 2020. Main change: pensions by wealth group (2023-Q4 top-10% share
+  53% vs 70% before, which had jumped from 51% in 2019). The stocks next-40 share stays near 9% (12% before
+  in 2023–24). Own-decile series are unchanged.
 
 ## 2026-10 (October 2026 vintage)
 
