@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-24 (balance-sheet items and products re-estimated)
+
+- Fixes a bug in the measurement equation (DD_replication 7108924): in the annual surveys (SCF, PSID, CPS) only
+  consumption, income and wealth had measurement rows, so any other measure in a run (the balance-sheet items and
+  the liquidity and debt measures of the products) was never linked to the model's state in those surveys. Its
+  distribution followed a trend through the survey waves, with quarterly movement only through the aggregate
+  anchor and the copula. Balance-sheet measures now load on the current state as point-in-time stocks.
+- The five items (`data/items/`: real estate, mortgages, consumer credit, pensions, stocks) and the four products
+  (`data/products/`) are re-estimated with the fix and the settings of the main data (tight aggregate
+  measurement-error prior, income rows at Q4 of the reference year, 1,600 sampler iterations).
+- Item wealth-group shares move by at most 2–5 points, mostly between SCF waves (the 1970s gap); survey-year values
+  change by less than half a point except pensions after 2023 (2023-Q4 top-10% share 49% vs 53%) and mortgages and
+  real estate in 2023-24 (1–2 points). Quarter-to-quarter variation rises for most items. Product shares of
+  households with no debt move by less than one point.
+
 ## 2026-10-24 (October 2026 vintage, corrected aggregate priors)
 
 - Re-estimated after fixing the specification of the aggregate priors in the measurement equation (the tight
@@ -10,8 +25,7 @@
   points (SCF-view wealth), 0.8 points (income) and 0.1 points (consumption); the 2022-Q3 SCF-view top-10%
   wealth share is 72.9% (73.0% before). The factors are re-identified (correlation with the previous vintage
   0.73–0.86 per factor), so `smoothed_factors`, the draws and `FactorMap` fits are not comparable across vintages.
-- Balance-sheet items (`data/items/`) and the four products (`data/products/`) are unchanged: separate
-  estimations that were not re-run.
+- Balance-sheet items and products: re-estimated in the entry above.
 
 ## 2026-10-19 (corrected October 2026 vintage)
 
