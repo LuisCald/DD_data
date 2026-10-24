@@ -3,7 +3,7 @@ message: "If you use these data, please cite the paper (preferred citation below
 title: "Distributional Dynamics: Quarterly Distributions of U.S. Consumption, Income and Wealth (Data)"
 type: dataset
 version: "2026.10"
-date-released: "2026-10-16"
+date-released: "2026-10-24"
 authors:
   - family-names: "Bayer"
     given-names: "Christian"

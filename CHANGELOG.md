@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-24 (October 2026 vintage, corrected aggregate priors)
+
+- Re-estimated after fixing the specification of the aggregate priors in the measurement equation (the tight
+  measurement-error prior on the aggregate factors was not being applied) and with the SCF and PSID income
+  rows placed at the fourth quarter of their reference year; 1,600 sampler iterations (400 before). All CIW
+  files rebuilt from the new run: coefficients, functional data, factors, posterior draws and bands, micro data
+  and implicates, `dd_series`, `dd_tidy_long`, CPS views. Published decile-group shares move by at most 1.2
+  points (SCF-view wealth), 0.8 points (income) and 0.1 points (consumption); the 2022-Q3 SCF-view top-10%
+  wealth share is 72.9% (73.0% before). The factors are re-identified (correlation with the previous vintage
+  0.73–0.86 per factor), so `smoothed_factors`, the draws and `FactorMap` fits are not comparable across vintages.
+- Balance-sheet items (`data/items/`) and the four products (`data/products/`) are unchanged: separate
+  estimations that were not re-run.
+
 ## 2026-10-19 (corrected October 2026 vintage)
 
 - Re-estimated with the corrected SCF 2022 wave (DD_replication issue #9): retirement accounts removed from

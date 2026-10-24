@@ -4,7 +4,7 @@ Quarterly estimates of the joint distribution of consumption, income and wealth 
 households, 1962-Q3 to 2024-Q1, combining five household surveys (PSID, SCF, CEX, SIPP, CPS)
 with aggregate data. From Bayer, Calderon and Kuhn, *Distributional Dynamics*, CEPR DP 19829.
 
-**Vintage:** October 2026 ([CHANGELOG](CHANGELOG.md)) ·
+**Vintage:** October 2026, 24 October release ([CHANGELOG](CHANGELOG.md)) ·
 [distributionaldynamics.com](https://www.distributionaldynamics.com)
 
 ## Which file do I need?

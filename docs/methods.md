@@ -8,7 +8,10 @@ Full methodology: Bayer, Calderon, Kuhn, "Distributional Dynamics", CEPR DP 1982
 These are the estimates from the paper's replication specification: 8 distributional
 factors and 11 aggregate factors, with the full innovation covariance in the likelihood.
 That covariance includes the contemporaneous correlation between distributional and
-aggregate innovations.
+aggregate innovations. The 24 October release re-estimates the model with the tight
+measurement-error prior on the aggregate factors (which an earlier release had not applied),
+the SCF and PSID income rows placed at the fourth quarter of their reference year, and 1,600
+sampler iterations; see the CHANGELOG for what moved.
 
 `smoothed_factors.csv` has 43 state columns:
 
